@@ -2,7 +2,7 @@
   "initial_data": {
     "year": 2005,
     "population": 103263388.0,
-    "gdp": 18929251.0,
+    "gdp": 18929250872000.00,
     "urbanization_rate": 0.763,
 
     "area_grains": 10500000,
@@ -39,11 +39,11 @@
     "diet_dairy_per_capita": 0.057911,
 
     "quota_water_crop": 4660.4,
-    "quota_water_ind": 151.25,
+    "quota_water_ind": 0.00015125,
     "quota_water_dom": 103.65,
     "quota_water_energy": 594872.0,
 
-    "intensity_energy_ind": 0.0002003,
+    "intensity_energy_ind": 0.0000000002003,
     "intensity_energy_dom": 0.0000070812,
     "energy_per_m3_water": 0.00000000342,
     "energy_intensity_agri": 0.000002103,
