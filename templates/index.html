@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WEFE Nexus - Simulador México</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="title">
+                    <span class="gradient-text">WEFE Nexus</span>
+                    <span class="subtitle">Simulador de Agua-Energía-Alimentos-Ecología</span>
+                </h1>
+                <div class="header-actions">
+                    <select id="scenarioSelect" class="scenario-select">
+                        <option value="">Cargar Escenario Predefinido...</option>
+                    </select>
+                    <button id="runSimulation" class="btn btn-primary">
+                        <span class="btn-icon">▶</span>
+                        Ejecutar Simulación
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Configuration Panel -->
+            <aside class="config-panel">
+                <h2 class="panel-title">Configuración del Modelo</h2>
+                
+                <!-- Social-Economic Parameters -->
+                <div class="config-section">
+                    <h3 class="section-title">
+                        <span class="icon">👥</span>
+                        Parámetros Socioeconómicos
+                    </h3>
+                    <div class="form-group">
+                        <label for="years">Años de Simulación</label>
+                        <input type="number" id="years" value="30" min="1" max="100">
+                    </div>
+                    <div class="form-group">
+                        <label for="population">Población Inicial</label>
+                        <input type="number" id="population" value="105811504">
+                    </div>
+                    <div class="form-group">
+                        <label for="gdp">PIB Inicial (millones)</label>
+                        <input type="number" id="gdp" value="9000000">
+                    </div>
+                    <div class="form-group">
+                        <label for="urbanization_rate">Tasa de Urbanización</label>
+                        <input type="number" id="urbanization_rate" value="0.765" step="0.001">
+                    </div>
+                </div>
+
+                <!-- Growth Scenarios -->
+                <div class="config-section">
+                    <h3 class="section-title">
+                        <span class="icon">📈</span>
+                        Escenarios de Crecimiento
+                    </h3>
+                    <div class="form-group">
+                        <label for="growth_pop">Crecimiento Poblacional (%)</label>
+                        <input type="number" id="growth_pop" value="1.4" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label for="growth_gdp">Crecimiento PIB (%)</label>
+                        <input type="number" id="growth_gdp" value="2.5" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label for="growth_urbanization">Crecimiento Urbanización (%)</label>
+                        <input type="number" id="growth_urbanization" value="0.4" step="0.1">
+                    </div>
+                </div>
+
+                <!-- Water Parameters -->
+                <div class="config-section">
+                    <h3 class="section-title">
+                        <span class="icon">💧</span>
+                        Subsistema Agua
+                    </h3>
+                    <div class="form-group">
+                        <label for="quota_water_crop">Cuota Agua Agrícola (m³/ha)</label>
+                        <input type="number" id="quota_water_crop" value="4500">
+                    </div>
+                    <div class="form-group">
+                        <label for="quota_water_dom">Cuota Agua Doméstica (m³/persona)</label>
+                        <input type="number" id="quota_water_dom" value="80">
+                    </div>
+                    <div class="form-group">
+                        <label for="quota_water_ind">Cuota Agua Industrial</label>
+                        <input type="number" id="quota_water_ind" value="0.02" step="0.001">
+                    </div>
+                </div>
+
+                <!-- Energy Parameters -->
+                <div class="config-section">
+                    <h3 class="section-title">
+                        <span class="icon">⚡</span>
+                        Subsistema Energía
+                    </h3>
+                    <div class="form-group">
+                        <label for="intensity_energy_ind">Intensidad Energética Industrial</label>
+                        <input type="number" id="intensity_energy_ind" value="0.018" step="0.001">
+                    </div>
+                    <div class="form-group">
+                        <label for="intensity_energy_dom">Intensidad Energética Doméstica</label>
+                        <input type="number" id="intensity_energy_dom" value="0.003" step="0.001">
+                    </div>
+                    <div class="form-group">
+                        <label for="emission_factor_coal">Factor Emisión Carbón</label>
+                        <input type="number" id="emission_factor_coal" value="3.2" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label for="emission_factor_oil">Factor Emisión Petróleo</label>
+                        <input type="number" id="emission_factor_oil" value="2.7" step="0.1">
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="config-actions">
+                    <button id="resetConfig" class="btn btn-secondary">
+                        <span class="btn-icon">↺</span>
+                        Restaurar Valores
+                    </button>
+                    <button id="addScenario" class="btn btn-accent">
+                        <span class="btn-icon">+</span>
+                        Agregar a Comparación
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Results Panel -->
+            <main class="results-panel">
+                <!-- Loading State -->
+                <div id="loadingState" class="loading-state" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>Ejecutando simulación...</p>
+                </div>
+
+                <!-- Results Content -->
+                <div id="resultsContent" class="results-content">
+                    <!-- Summary Cards -->
+                    <div class="summary-cards">
+                        <div class="summary-card water-card">
+                            <div class="card-icon">💧</div>
+                            <div class="card-content">
+                                <h4>Ratio Agua Final</h4>
+                                <p class="card-value" id="waterRatio">-</p>
+                                <span class="card-label">Oferta/Demanda</span>
+                            </div>
+                        </div>
+                        <div class="summary-card food-card">
+                            <div class="card-icon">🌾</div>
+                            <div class="card-content">
+                                <h4>Ratio Alimentos Final</h4>
+                                <p class="card-value" id="foodRatio">-</p>
+                                <span class="card-label">Seguridad Alimentaria</span>
+                            </div>
+                        </div>
+                        <div class="summary-card energy-card">
+                            <div class="card-icon">⚡</div>
+                            <div class="card-content">
+                                <h4>Ratio Energía Final</h4>
+                                <p class="card-value" id="energyRatio">-</p>
+                                <span class="card-label">Oferta/Demanda</span>
+                            </div>
+                        </div>
+                        <div class="summary-card ecology-card">
+                            <div class="card-icon">🌍</div>
+                            <div class="card-content">
+                                <h4>Emisiones CO₂ Total</h4>
+                                <p class="card-value" id="co2Total">-</p>
+                                <span class="card-label">Toneladas</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts -->
+                    <div class="charts-container">
+                        <div class="chart-wrapper">
+                            <h3 class="chart-title">Subsistema Agua</h3>
+                            <canvas id="waterChart"></canvas>
+                        </div>
+                        <div class="chart-wrapper">
+                            <h3 class="chart-title">Subsistema Alimentos</h3>
+                            <canvas id="foodChart"></canvas>
+                        </div>
+                        <div class="chart-wrapper">
+                            <h3 class="chart-title">Subsistema Energía</h3>
+                            <canvas id="energyChart"></canvas>
+                        </div>
+                        <div class="chart-wrapper">
+                            <h3 class="chart-title">Subsistema Ecología - Emisiones CO₂</h3>
+                            <canvas id="ecologyChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Export Actions -->
+                    <div class="export-actions">
+                        <button id="exportCSV" class="btn btn-secondary">
+                            <span class="btn-icon">📊</span>
+                            Exportar CSV
+                        </button>
+                        <button id="exportJSON" class="btn btn-secondary">
+                            <span class="btn-icon">📄</span>
+                            Exportar JSON
+                        </button>
+                        <button id="clearScenarios" class="btn btn-danger">
+                            <span class="btn-icon">🗑</span>
+                            Limpiar Comparaciones
+                        </button>
+                    </div>
+
+                    <!-- Scenarios Comparison -->
+                    <div id="scenariosComparison" class="scenarios-comparison" style="display: none;">
+                        <h3 class="section-title">Comparación de Escenarios</h3>
+                        <div id="scenariosList" class="scenarios-list"></div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- App Script -->
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

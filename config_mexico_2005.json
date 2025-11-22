@@ -1,0 +1,63 @@
+{
+  "initial_data": {
+    "year": 2005,
+    "population": 103263388.0,
+    "gdp": 18929251.0,
+    "urbanization_rate": 0.763,
+
+    "area_grains": 10500000,
+    "area_veggies": 600000,
+    "area_fruits": 1500000,
+    "area_meat": 100000000,
+    "area_dairy": 2000000,
+
+    "yield_grains": 3.2,
+    "yield_veggies": 18.0,
+    "yield_fruits": 12.0,
+    "yield_meat": 0.04,
+    "yield_poultry": 1.8,
+    "yield_dairy": 5.0,
+
+    "ws_surface": 395210000000.0,
+    "ws_ground": 76984000000.0,
+    "ws_unconventional": 835700000.0,
+    "wd_eco_req": 141658000000.0,
+
+    "energy_production_total": 7093.954,
+    "es_coal": 470.039,
+    "es_oil": 3414.267,
+    "es_gas": 2453.568,
+    "es_renewables": 756.082
+  },
+
+  "params": {
+    "diet_grains_per_capita": 0.135995,
+    "diet_veggies_per_capita": 0.048735,
+    "diet_fruits_per_capita": 0.101642,
+    "diet_red_meat_per_capita": 0.016567,
+    "diet_white_meat_per_capita": 0.031635,
+    "diet_dairy_per_capita": 0.057911,
+
+    "quota_water_crop": 4660.4,
+    "quota_water_ind": 151.25,
+    "quota_water_dom": 103.65,
+    "quota_water_energy": 594872.0,
+
+    "intensity_energy_ind": 0.0002003,
+    "intensity_energy_dom": 0.0000070812,
+    "energy_per_m3_water": 0.00000000342,
+    "energy_intensity_agri": 0.000002103,
+    "straw_energy_factor": 0.000003,
+
+    "emission_factor_coal": 99587.5,
+    "emission_factor_oil": 85265.7,
+    "emission_factor_gas": 43006.7,
+    "pollutant_concentration_dom": 0.0463
+  },
+
+  "scenarios": {
+    "growth_pop": 0.0115,
+    "growth_gdp": 0.01,
+    "growth_urbanization": 0.0176
+  }
+}
