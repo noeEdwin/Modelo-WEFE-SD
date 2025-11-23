@@ -169,4 +169,66 @@ A continuación se explica la correspondencia entre los datos originales de tu E
 | `intensity_energy_ind` | `intensity_energy_ind` | 0.0002 PJ/Millón | 2.003e-10 | **Escala:** Se dividió entre 1,000,000 para obtener PJ por **Peso ($)**. |
 | `intensity_energy_dom` | `intensity_energy_dom` | 1,967 kWh/hab | 7.08e-6 | **Conversión:** kWh $\to$ PJ ($1 kWh = 3.6 \times 10^{-9} PJ$). |
 | `energy_per_m3_water` | `energy_per_m3_water` | 0.95 kWh/$m^3$ | 3.42e-9 | **Conversión:** kWh $\to$ PJ. |
-| `emission_factor_coal` | `emission_factor_coal` | 99,587 Ton/PJ | 99,587.5 | **Directo.** Toneladas de CO2 por PJ. |
+
+---
+
+## 📐 Parte 4: Detalle de Ecuaciones y Variables (Ling et al., 2024)
+
+Esta sección conecta cada ecuación del paper original (Imágenes) con las variables exactas del archivo `config_mexico_2005.json` y la línea de código en `wefe_model.py` donde se calcula.
+
+### 1. Subsistema de Agua (Water)
+
+| Ecuación (Paper) | Descripción Simple | Variables JSON (Inputs) | Código Python (`_step_water`) |
+| :--- | :--- | :--- | :--- |
+| **(1)** $WD = \sum WD_i$ | **Demanda Total:** Suma del agua usada por agricultura, industria, casas y energía. | N/A (Calculado) | `wd_human` (Línea 99) |
+| **(2)** $WD_{agri} = \sum (S_i \times WQ_i)$ | **Agua Agrícola:** Hectáreas sembradas $\times$ Cuota de riego. | `area_grains`, `area_veggies`, `area_fruits`, `quota_water_crop` | `wd_agri` (Línea 87) |
+| **(3)** $WD_{ind} = GDP \times WQ_{sec}$ | **Agua Industrial:** PIB $\times$ Intensidad de uso de agua industrial. | `gdp`, `quota_water_ind` | `wd_ind` (Línea 90) |
+| **(4)** $WD_{dom} = P \times WQ_{dom}$ | **Agua Doméstica:** Población $\times$ Consumo por persona. | `population`, `quota_water_dom` | `wd_dom` (Línea 93) |
+| **(5)** $WD_{energy} = \sum (ES \times WQ_e)$ | **Agua para Energía:** Energía producida $\times$ Agua necesaria para enfriamiento/procesos. | `energy_production_total`, `quota_water_energy` | `wd_energy` (Línea 96) |
+| **(6)** $WS = WS_{sup} + WS_{sub} + WS_{un}$ | **Oferta Total (Bruta):** Agua superficial + subterránea + no convencional. | `ws_surface`, `ws_ground`, `ws_unconventional` | `total_ws_natural` (Línea 107) |
+| **(7)** $W_R = WS / WD$ | **Estrés Hídrico:** Relación entre oferta disponible y demanda. | N/A (Calculado) | `w_r` (Línea 114) |
+
+> **Nota sobre Eq (7):** En el código, usamos la **Oferta Neta** ($WS - WD_{eco}$) para calcular el estrés, respetando la restricción ecológica.
+>
+> **Justificación del Caudal Ecológico (30%):**
+> El modelo utiliza un valor de $141,658 \text{ hm}^3$ para $WD_{eco}$ (Ecuación 1). Este valor corresponde al **30% de la Disponibilidad Natural Media Total** ($472,194 \text{ hm}^3$) reportada para 2005.
+> *   **Razón:** Ante la falta de datos desagregados de "Descarga Natural Comprometida" en el reporte histórico de 2005, se aplicó el **método presuntivo estándar** (basado en Tennant) que recomienda reservar entre el 20-40% del caudal para el mantenimiento de los ecosistemas.
+> *   **Impacto:** Esto explica por qué la "Oferta Disponible" del modelo es menor a la "Oferta Bruta" de CONAGUA; el modelo descuenta el agua que la naturaleza necesita para sobrevivir.
+
+### 2. Subsistema de Energía (Energy)
+
+| Ecuación (Paper) | Descripción Simple | Variables JSON (Inputs) | Código Python (`_step_energy`) |
+| :--- | :--- | :--- | :--- |
+| **(8)** $ED = \sum ED_i$ | **Demanda Total:** Suma de energía requerida por todos los sectores. | N/A (Calculado) | `total_ed` (Línea 141) |
+| **(9)** $ED_{food} = \sum ED_{f-i}$ | **Energía Agrícola:** Combustible para tractores y maquinaria por tonelada de alimento. | `energy_intensity_agri` | `ed_agri` (Línea 139) |
+| **(10)** $ED_{ind} = \sum (GDP \times EC_n)$ | **Energía Industrial:** PIB $\times$ Intensidad energética industrial. | `gdp`, `intensity_energy_ind` | `ed_ind` (Línea 132) |
+| **(11)** $ED_{dom} = P \times EC_{dom}$ | **Energía Doméstica:** Población $\times$ Consumo de luz/gas por persona. | `population`, `intensity_energy_dom` | `ed_dom` (Línea 133) |
+| **(12)** $ED_{water} = \sum ED_{w-k}$ | **Energía para Agua:** Electricidad para bombeo y tratamiento por $m^3$. | `energy_per_m3_water` | `ed_water` (Línea 136) |
+| **(13)** $ES = \sum ES_i$ | **Oferta Total:** Suma de fósiles (carbón, petróleo, gas) y renovables. | `es_coal`, `es_oil`, `es_gas`, `es_renewables` | `total_es` (Línea 171) |
+| **(14)** $ES_{food} = FS_c \times std$ | **Bioenergía:** Energía generada a partir de residuos de cultivos (paja). | `straw_energy_factor` | `bioenergy` (Línea 147) |
+| **(15)** $E_R = ES / ED$ | **Balance Energético:** Relación entre oferta y demanda. | N/A (Calculado) | `e_r` (Línea 175) |
+
+### 3. Subsistema de Alimentos (Food)
+
+| Ecuación (Paper) | Descripción Simple | Variables JSON (Inputs) | Código Python (`_step_food`) |
+| :--- | :--- | :--- | :--- |
+| **(16)** $FD = \sum FD_i$ | **Demanda Total:** Suma de todo el alimento requerido (Humano + Ganado). | N/A (Calculado) | `total_fd` (Línea 59) |
+| **(17)** $FD_{per} = P \times FD_{p-i}$ | **Demanda Humana:** Población $\times$ Dieta per cápita. | `population`, `diet_*` | `fd_*` (Líneas 37-41) |
+| **(18)** $FS = \sum FS_i$ | **Oferta Total:** Suma de toda la producción agrícola y ganadera. | N/A (Calculado) | `total_fs` (Línea 68) |
+| **(19)** $FS_{yield} = S \times yield$ | **Producción:** Área (o Cabezas) $\times$ Rendimiento. | `area_*`, `heads_*`, `yield_*` | `fs_*` (Líneas 62-66) |
+| **(20)** $F_R = FS / FD$ | **Seguridad Alimentaria:** Relación entre producción y demanda. | N/A (Calculado) | `food_ratio` (Línea 73) |
+
+### 4. Subsistema de Ecología (Ecology)
+
+| Ecuación (Paper) | Descripción Simple | Variables JSON (Inputs) | Código Python (`_step_ecology`) |
+| :--- | :--- | :--- | :--- |
+| **(21)** $COD = \sum COD_i$ | **Contaminación Agua:** Demanda Química de Oxígeno total. | N/A (Calculado) | `total_cod` (Línea 219) |
+| **(22)** $COD_{dom} = WW \times c$ | **COD Doméstico:** Aguas residuales $\times$ Concentración de contaminantes. | `pollutant_concentration_dom` | `total_cod` (Línea 219) |
+| **(23)** $CO_2 = \sum CO_{2i}$ | **Emisiones Totales:** Suma de emisiones por tipo de combustible. | N/A (Calculado) | `total_co2` (Línea 214) |
+| **(24)** $CO_{2fuel} = ED \times EF$ | **Emisión por Fuente:** Consumo de combustible $\times$ Factor de emisión. | `emission_factor_coal`, `emission_factor_oil`, `emission_factor_gas` | `co2_*` (Líneas 209-211) |
+
+### 5. Validación del Modelo
+
+| Ecuación (Paper) | Descripción Simple | Variables JSON (Inputs) | Código Python (`calibrar`) |
+| :--- | :--- | :--- | :--- |
+| **(25)** $\theta = \frac{\|x' - x\|}{x}$ | **Error Relativo:** Porcentaje de diferencia entre Simulación ($x'$) y Realidad ($x$). | Datos SQL vs `history` | `calibrar` (Línea 303) |
