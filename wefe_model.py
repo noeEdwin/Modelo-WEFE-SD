@@ -62,8 +62,8 @@ class WEFEModel:
         fs_grains = s['area_grains'] * s['yield_grains']
         fs_veggies = s['area_veggies'] * s['yield_veggies']
         fs_fruits = s['area_fruits'] * s['yield_fruits']
-        fs_meat = (s['area_meat'] * s['yield_meat']) + (s.get('area_poultry', 0) * s.get('yield_poultry', 0))
-        fs_dairy = s['area_dairy'] * s['yield_dairy']
+        fs_meat = (s['heads_cows'] * s['yield_meat']) + (s['heads_poultry'] * s['yield_poultry'])
+        fs_dairy = s['heads_dairy'] * s['yield_dairy']
         
         total_fs = fs_grains + fs_veggies + fs_fruits + fs_meat + fs_dairy
         
@@ -96,7 +96,7 @@ class WEFEModel:
         wd_energy = s['energy_production_total'] * p['quota_water_energy']
         
         # Total Demanda Humana (Consuntiva)
-        wd_human = wd_agri + wd_ind + wd_dom + wd_energy
+        wd_human = (wd_agri + wd_ind + wd_dom + wd_energy) / 1000000.0
         
         # --- REQUERIMIENTO ECOLÓGICO ---
         # No es demanda consuntiva, es una restricción a la oferta
@@ -210,7 +210,8 @@ class WEFEModel:
         co2_oil = energy_metrics['consumption_oil'] * p['emission_factor_oil']
         co2_gas = energy_metrics['consumption_gas'] * p.get('emission_factor_gas', 0)
         
-        total_co2 = co2_coal + co2_oil + co2_gas
+        # Convertimos de Toneladas a Megatoneladas (Mt)
+        total_co2 = (co2_coal + co2_oil + co2_gas) / 1000000.0
         
         # --- COD (Eq 21-22) ---
         # Contaminación del agua
