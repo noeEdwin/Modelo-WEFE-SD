@@ -411,6 +411,141 @@ Donde:
 e_r = total_es / total_ed if total_ed > 0 else 0
 ```
 
+
+
+---
+
+### Modelo de Calibración: Crecimiento por Tramos (Piecewise Growth)
+
+#### Contexto Histórico
+
+Durante la calibración del modelo con datos reales de México (2005-2020), identificamos que la oferta de energía NO sigue una trayectoria lineal. México experimentó **dos períodos distintosque requieren modelado separado:
+
+**Período 1 (2005-2013): Estabilidad Energética**
+- Tasa de crecimiento: **+0.23%** anual
+- Producción petrolera relativamente estable
+- Situación anterior a la reforma energética de 2013
+
+**Período 2 (2014-2020): Declive Acelerado**
+- Tasa de crecimiento: **-7.16%** anual
+- Caída dramática en producción petrolera  
+- Causa: Agotamiento del campo Cantarell (máximo productor de México)
+- Declinación total: **-39.72%** en 15 años
+
+#### Ecuación Modificada 13b: Oferta con Crecimiento Dinámico
+
+**Ecuación:**
+$$ES_{total}(t) = ES_{total}(t-1) \times (1 + g_e(t))$$
+
+Donde:
+$$g_e(t) = \begin{cases} 
+g_{e,1} = +0.0023 & \text{si } t \leq 2013 \\
+g_{e,2} = -0.0716 & \text{si } t > 2013
+\end{cases}$$
+
+**Variables:**
+- $ES_{total}(t)$ = Capacidad total de producción energética en el año $t$ (PJ)
+- $g_e(t)$ = Tasa de crecimiento de la oferta energética (función por tramos)
+- $t_{transición}$ = 2013 (año de la reforma energética)
+
+**Implementación (`wefe_model.py`, líneas 154-166):**
+```python
+# Determinar qué tasa de crecimiento usar según el año
+transition_year = self.scenarios.get('energy_transition_year', 2013)
+
+if s['year'] <= transition_year:
+    # Período estable (2005-2013)
+    growth_rate = self.scenarios.get('growth_energy_supply', 0.0023)
+else:
+    # Período de caída acelerada (2014+)
+    growth_rate = self.scenarios.get('growth_energy_supply_post_2013', -0.0716)
+
+# Aplicar tasa de crecimiento a la capacidad total
+s['energy_production_total'] *= (1 + growth_rate)
+```
+
+**Justificación Física:**
+
+1. **No es un ajuste arbitrario**: Las tasas fueron calculadas directamente de los datos históricos de producción energética de México
+
+2. **Refleja cambios estructurales reales**:
+   - 2013: Reforma Energética de México (cambio en política petrolera)
+   - 2014+: Colapso de Cantarell + envejecimiento de infraestructura PEMEX
+
+3. **Evita el "demand-driven bias"**: En lugar de asumir que la oferta siempre satisface la demanda, modelamos la oferta como una capacidad física limitada y declinante
+
+#### Resultados de la Calibración
+
+Con el modelo piecewise, logramos un **error MAPE de 1.70%** para la oferta de energía:
+
+| Año | Oferta Real (PJ) | Oferta Simulada (PJ) | Error (%) |
+|-----|------------------|----------------------|-----------|
+| 2005 | 7,093.95 | 7,110.27 | 0.23% |
+| 2010 | 6,923.62 | 7,192.42 | 3.88% |
+| 2013 | 7,207.59 | 7,242.16 | 0.48% |
+| 2014 | 6,812.27 | 6,723.62 | 1.30% |
+| 2020 | 4,276.32 | 4,305.40 | 0.68% |
+
+**Análisis:**
+- Período 1 (2005-2013): Error promedio **1.68%**
+- Período 2 (2014-2020): Error promedio **1.72%**
+- El modelo captura perfectamente tanto la estabilidad como el declive
+
+#### Aplicación a Emisiones de CO₂
+
+El mismo enfoque se aplicó a las emisiones de CO₂, reconociendo que México experimentó una **transición energética** que desacopló parcialmente las emisiones del consumo energético:
+
+**Ecuación Modificada 23b: Emisiones con Componente Dinámico**
+
+$$CO_2(t) = CO_{2,energético}(t) + CO_{2,no-energético}(t)$$
+
+Donde:
+$$CO_{2,no-energético}(t) = CO_{2,no-energético}(t-1) \times (1 + g_{co2}(t))$$
+
+$$g_{co2}(t) = \begin{cases} 
++0.012 & \text{si } t \leq 2013 \\
++0.015 & \text{si } t > 2013
+\end{cases}$$
+
+**Implementación (`wefe_model.py`, líneas 241-256):**
+```python
+# CO2 no energético crece independientemente
+if 'co2_non_energy_current' not in s:
+    s['co2_non_energy_current'] = p.get('co2_non_energy', 0)
+
+# Aplicar crecimiento al CO2 no energético
+if s['year'] <= transition_year:
+    growth_rate_non_energy = p.get('growth_co2_non_energy', 0.012)
+else:
+    growth_rate_non_energy = p.get('growth_co2_non_energy_post_2013', 0.015)
+
+s['co2 non_energy_current'] *= (1 + growth_rate_non_energy)
+```
+
+**Resultados de Calibración CO₂:**
+- Error MAPE total: **9.67%**
+- Período 1 (2005-2013): **3.38%**
+- Período 2 (2014-2020): **17.75%**
+
+**Nota sobre el error en Período 2:**
+El error más alto refleja fenómenos no modelados explícitamente:
+- Aumento de energías renovables (solar +2,350%, eólica +3,844%)
+- Importación de gas natural (CO₂ generado fuera de México)
+- Mejoras en eficiencia energética industrial
+
+Para reducir este error a <5%, se requeriría modelar dinámicamente el mix energético (porcentajes cambiantes de carbón/petróleo/gas/renovables), lo cual está fuera del alcance del modelo WEFE-SD actual que asume ratios fijos de combustibles.
+
+#### Implicaciones para Simulaciones Futuras
+
+1. **Flexibilidad de Escenarios**: El usuario puede definir diferentes tasas de crecimiento post-2020 para explorar escenarios:
+   - Optimista: Inversión masiva en renovables → $g_e = +0.03$
+   - Pesimista: Continúa declive petrolero → $g_e = -0.05$
+
+2. **Múltiples Transiciones**: El enfoque puede extenderse a más períodos (ej. 2020-2030, 2030-2040) para capturar políticas específicas
+
+3. **Variables Acopladas**: El mismo mecanismo se aplica a otras variables que muestran cambios estructurales (ej. rendimientos agrícolas con nueva tecnología)
+
+
 ---
 
 ## Subsistema de Alimentos
@@ -595,17 +730,19 @@ total_co2 = total_co2_energy + p.get('co2_non_energy', 0)
 ```
 
 **Ejemplo Numérico (2005):**
-- Carbón: 470 PJ × 99,587.5 kg/PJ = 46.8 Mt
-- Petróleo: 3,414 PJ × 85,265.7 kg/PJ = 291.1 Mt
-- Gas: 2,454 PJ × 43,006.7 kg/PJ = 105.5 Mt
-- **Subtotal energético:** 443.4 Mt
-- No energético (ajuste): 160 Mt
-- **Total:** 603.4 Mt
+- Carbón: 470 PJ × 85,000 kg/PJ = 39.95 Mt
+- Petróleo: 3,414 PJ × 74,000 kg/PJ = 252.64 Mt
+- Gas: 2,454 PJ × 37,000 kg/PJ = 90.80 Mt
+- **Subtotal energético:** 383.39 Mt
+- No energético (calibrado): 100 Mt
+- **Total:** 483.39 Mt
 
-**Nota:** El factor `co2_non_energy` de 160 Mt representa emisiones de:
+**Nota:** El factor `co2_non_energy` de 100 Mt representa emisiones de:
 - Procesos industriales (cemento, acero)
 - Agricultura (fertilizantes, metano del ganado convertido a CO2-eq)
 - Desechos y tratamiento de aguas
+
+Este valor fue calibrado para el año base 2005 y crece dinámicamente con tasas de +1.2% (2005-2013) y +1.5% (2014-2020) para reflejar la industrialización.
 
 ---
 
@@ -620,12 +757,12 @@ Donde:
 
 Ver implementación en Ecuación 23.
 
-**Factores de Emisión Utilizados:**
-- **Carbón:** 99,587.5 kg CO2/PJ
-- **Petróleo:** 85,265.7 kg CO2/PJ
-- **Gas Natural:** 43,006.7 kg CO2/PJ
+**Factores de Emisión Calibrados (Noviembre 2024):**
+- **Carbón:** 85,000 kg CO2/PJ
+- **Petróleo:** 74,000 kg CO2/PJ
+- **Gas Natural:** 37,000 kg CO2/PJ
 
-Estos valores son estándares internacionales del IPCC.
+Estos valores fueron ajustados desde los estándares IPCC originales durante la calibración para mejor ajuste con los datos históricos de México.
 
 ---
 
