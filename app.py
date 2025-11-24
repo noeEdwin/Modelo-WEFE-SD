@@ -148,42 +148,36 @@ def export_csv():
 
 @app.route('/api/scenarios', methods=['GET'])
 def get_scenarios():
-    """Obtiene escenarios predefinidos"""
+    """Obtiene escenarios predefinidos para la simulación WEFE"""
     scenarios = {
-        'base': {
-            'name': 'Escenario Base (2005)',
-            'description': 'Configuración histórica de México 2005',
+        'base_2005': {
+            'name': 'Caso Base 2005 (Business as Usual)',
+            'description': 'Configuración histórica de México 2005 con tasas de crecimiento moderadas',
             'scenarios': {
-                'growth_pop': 0.014,
-                'growth_gdp': 0.025,
-                'growth_urbanization': 0.004
+                'growth_pop': 0.0115,      # 1.15% anual - tasa histórica
+                'growth_gdp': 0.01,       # 1% anual - crecimiento moderado
+                'growth_urbanization': 0.0176,  # 1.76% anual
+                'growth_agri_yield': 0.022     # 2.2% anual - mejora gradual
             }
         },
-        'optimista': {
-            'name': 'Escenario Optimista',
-            'description': 'Crecimiento económico alto con mejoras tecnológicas',
+        'crecimiento_acelerado': {
+            'name': 'Crecimiento Acelerado (Presión WEFE)',
+            'description': 'Alto crecimiento poblacional y económico - máxima presión sobre recursos agua-energía-alimento',
             'scenarios': {
-                'growth_pop': 0.010,
-                'growth_gdp': 0.035,
-                'growth_urbanization': 0.006
+                'growth_pop': 0.020,       # 2.0% anual - presión demográfica alta
+                'growth_gdp': 0.045,       # 4.5% anual - industrialización acelerada
+                'growth_urbanization': 0.008,  # 0.8% anual - urbanización rápida
+                'growth_agri_yield': 0.015     # 1.5% anual - tecnología agrícola rezagada
             }
         },
-        'pesimista': {
-            'name': 'Escenario Pesimista',
-            'description': 'Crecimiento bajo con estrés de recursos',
+        'transicion_sostenible': {
+            'name': 'Transición Sostenible (Eficiencia WEFE)',
+            'description': 'Crecimiento controlado con innovación tecnológica - eficiencia en uso de recursos',
             'scenarios': {
-                'growth_pop': 0.018,
-                'growth_gdp': 0.015,
-                'growth_urbanization': 0.003
-            }
-        },
-        'sostenible': {
-            'name': 'Escenario Sostenible',
-            'description': 'Enfoque en eficiencia y sostenibilidad',
-            'scenarios': {
-                'growth_pop': 0.008,
-                'growth_gdp': 0.028,
-                'growth_urbanization': 0.005
+                'growth_pop': 0.008,       # 0.8% anual - control demográfico
+                'growth_gdp': 0.032,       # 3.2% anual - crecimiento verde
+                'growth_urbanization': 0.005,  # 0.5% anual - urbanización planificada
+                'growth_agri_yield': 0.040     # 4.0% anual - revolución agrotecnológica
             }
         }
     }

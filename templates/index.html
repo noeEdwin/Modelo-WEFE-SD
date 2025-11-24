@@ -36,27 +36,15 @@
             <aside class="config-panel">
                 <h2 class="panel-title">Configuración del Modelo</h2>
                 
-                <!-- Social-Economic Parameters -->
+                <!-- Simulation Parameters -->
                 <div class="config-section">
                     <h3 class="section-title">
-                        <span class="icon">👥</span>
-                        Parámetros Socioeconómicos
+                        <span class="icon">⏱️</span>
+                        Parámetros de Simulación
                     </h3>
                     <div class="form-group">
                         <label for="years">Años de Simulación</label>
                         <input type="number" id="years" value="30" min="1" max="100">
-                    </div>
-                    <div class="form-group">
-                        <label for="population">Población Inicial</label>
-                        <input type="number" id="population" value="105811504">
-                    </div>
-                    <div class="form-group">
-                        <label for="gdp">PIB Inicial (millones)</label>
-                        <input type="number" id="gdp" value="9000000">
-                    </div>
-                    <div class="form-group">
-                        <label for="urbanization_rate">Tasa de Urbanización</label>
-                        <input type="number" id="urbanization_rate" value="0.765" step="0.001">
                     </div>
                 </div>
 
@@ -81,50 +69,6 @@
                     <div class="form-group">
                         <label for="growth_agri_yield">Crecimiento Rendimiento Agrícola (%)</label>
                         <input type="number" id="growth_agri_yield" value="2.2" step="0.1">
-                    </div>
-                </div>
-
-                <!-- Water Parameters -->
-                <div class="config-section">
-                    <h3 class="section-title">
-                        <span class="icon">💧</span>
-                        Subsistema Agua
-                    </h3>
-                    <div class="form-group">
-                        <label for="quota_water_crop">Cuota Agua Agrícola (m³/ha)</label>
-                        <input type="number" id="quota_water_crop" value="4500">
-                    </div>
-                    <div class="form-group">
-                        <label for="quota_water_dom">Cuota Agua Doméstica (m³/persona)</label>
-                        <input type="number" id="quota_water_dom" value="80">
-                    </div>
-                    <div class="form-group">
-                        <label for="quota_water_ind">Cuota Agua Industrial</label>
-                        <input type="number" id="quota_water_ind" value="0.02" step="0.001">
-                    </div>
-                </div>
-
-                <!-- Energy Parameters -->
-                <div class="config-section">
-                    <h3 class="section-title">
-                        <span class="icon">⚡</span>
-                        Subsistema Energía
-                    </h3>
-                    <div class="form-group">
-                        <label for="intensity_energy_ind">Intensidad Energética Industrial</label>
-                        <input type="number" id="intensity_energy_ind" value="0.018" step="0.001">
-                    </div>
-                    <div class="form-group">
-                        <label for="intensity_energy_dom">Intensidad Energética Doméstica</label>
-                        <input type="number" id="intensity_energy_dom" value="0.003" step="0.001">
-                    </div>
-                    <div class="form-group">
-                        <label for="emission_factor_coal">Factor Emisión Carbón</label>
-                        <input type="number" id="emission_factor_coal" value="3.2" step="0.1">
-                    </div>
-                    <div class="form-group">
-                        <label for="emission_factor_oil">Factor Emisión Petróleo</label>
-                        <input type="number" id="emission_factor_oil" value="2.7" step="0.1">
                     </div>
                 </div>
 

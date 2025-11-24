@@ -58,54 +58,22 @@ async function loadPredefinedScenarios() {
 
 // ===== Populate Form =====
 function populateForm(config) {
-    // Social-Economic
-    document.getElementById('population').value = config.initial_data.population;
-    document.getElementById('gdp').value = config.initial_data.gdp;
-    document.getElementById('urbanization_rate').value = config.initial_data.urbanization_rate;
-    
     // Growth Scenarios (convert to percentage)
     document.getElementById('growth_pop').value = (config.scenarios.growth_pop * 100).toFixed(1);
     document.getElementById('growth_gdp').value = (config.scenarios.growth_gdp * 100).toFixed(1);
     document.getElementById('growth_urbanization').value = (config.scenarios.growth_urbanization * 100).toFixed(1);
     document.getElementById('growth_agri_yield').value = (config.scenarios.growth_agri_yield * 100).toFixed(1);
-    
-    // Water
-    document.getElementById('quota_water_crop').value = config.params.quota_water_crop;
-    document.getElementById('quota_water_dom').value = config.params.quota_water_dom;
-    document.getElementById('quota_water_ind').value = config.params.quota_water_ind;
-    
-    // Energy
-    document.getElementById('intensity_energy_ind').value = config.params.intensity_energy_ind;
-    document.getElementById('intensity_energy_dom').value = config.params.intensity_energy_dom;
-    document.getElementById('emission_factor_coal').value = config.params.emission_factor_coal;
-    document.getElementById('emission_factor_oil').value = config.params.emission_factor_oil;
 }
 
 // ===== Get Form Data =====
 function getFormData() {
     const config = JSON.parse(JSON.stringify(currentConfig)); // Deep clone
     
-    // Update with form values
-    config.initial_data.population = parseFloat(document.getElementById('population').value);
-    config.initial_data.gdp = parseFloat(document.getElementById('gdp').value);
-    config.initial_data.urbanization_rate = parseFloat(document.getElementById('urbanization_rate').value);
-    
     // Growth scenarios (convert from percentage)
     config.scenarios.growth_pop = parseFloat(document.getElementById('growth_pop').value) / 100;
     config.scenarios.growth_gdp = parseFloat(document.getElementById('growth_gdp').value) / 100;
     config.scenarios.growth_urbanization = parseFloat(document.getElementById('growth_urbanization').value) / 100;
     config.scenarios.growth_agri_yield = parseFloat(document.getElementById('growth_agri_yield').value) / 100;
-    
-    // Water
-    config.params.quota_water_crop = parseFloat(document.getElementById('quota_water_crop').value);
-    config.params.quota_water_dom = parseFloat(document.getElementById('quota_water_dom').value);
-    config.params.quota_water_ind = parseFloat(document.getElementById('quota_water_ind').value);
-    
-    // Energy
-    config.params.intensity_energy_ind = parseFloat(document.getElementById('intensity_energy_ind').value);
-    config.params.intensity_energy_dom = parseFloat(document.getElementById('intensity_energy_dom').value);
-    config.params.emission_factor_coal = parseFloat(document.getElementById('emission_factor_coal').value);
-    config.params.emission_factor_oil = parseFloat(document.getElementById('emission_factor_oil').value);
     
     return config;
 }
