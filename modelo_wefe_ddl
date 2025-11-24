@@ -1,0 +1,27 @@
+-- Crear esquema si no existe
+CREATE SCHEMA IF NOT EXISTS ModeloWEFE;
+SET search_path TO ModeloWEFE;
+
+-- Borrar la tabla si ya existe
+DROP TABLE IF EXISTS validacion_historica_mexico;
+
+CREATE TABLE validacion_historica_mexico (
+    anio INT PRIMARY KEY,                    -- Año como clave primaria
+    poblacion_real BIGINT NOT NULL,          -- Entero largo para población (> 100 millones)
+    pib_real NUMERIC(20, 2) NOT NULL,        -- Numeric para manejar billones con centavos
+    prod_granos_real NUMERIC(18, 2),         -- Producción agrícola
+    prod_hortalizas_real NUMERIC(18, 2),   
+    prod_frutas_real NUMERIC(18, 2),
+    prod_carne_real NUMERIC(18, 2),          -- Producción pecuaria
+    prod_lacteos_real NUMERIC(18, 2),
+    oferta_agua_total NUMERIC(18, 2),        -- Recursos hídricos
+    demanda_agua_total NUMERIC(18, 2),
+    consumo_energia_real NUMERIC(18, 3),     -- Energía (con 3 decimales según tus datos)
+    emisiones_co2_real NUMERIC(18, 3)        -- Emisiones (con 3 decimales)
+);
+
+
+COMMENT ON TABLE validacion_historica_mexico IS 'Datos históricos de México para validación del modelo WEFE (2005-2020)';
+COMMENT ON COLUMN validacion_historica_mexico.pib_real IS 'Producto Interno Bruto en pesos constantes/reales';
+COMMENT ON COLUMN validacion_historica_mexico.consumo_energia_real IS 'Consumo de energía en Petajoules (PJ)';
+COMMENT ON COLUMN validacion_historica_mexico.emisiones_co2_real IS 'Emisiones en millones de toneladas de CO2';

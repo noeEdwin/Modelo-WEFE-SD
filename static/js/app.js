@@ -67,6 +67,7 @@ function populateForm(config) {
     document.getElementById('growth_pop').value = (config.scenarios.growth_pop * 100).toFixed(1);
     document.getElementById('growth_gdp').value = (config.scenarios.growth_gdp * 100).toFixed(1);
     document.getElementById('growth_urbanization').value = (config.scenarios.growth_urbanization * 100).toFixed(1);
+    document.getElementById('growth_agri_yield').value = (config.scenarios.growth_agri_yield * 100).toFixed(1);
     
     // Water
     document.getElementById('quota_water_crop').value = config.params.quota_water_crop;
@@ -93,6 +94,7 @@ function getFormData() {
     config.scenarios.growth_pop = parseFloat(document.getElementById('growth_pop').value) / 100;
     config.scenarios.growth_gdp = parseFloat(document.getElementById('growth_gdp').value) / 100;
     config.scenarios.growth_urbanization = parseFloat(document.getElementById('growth_urbanization').value) / 100;
+    config.scenarios.growth_agri_yield = parseFloat(document.getElementById('growth_agri_yield').value) / 100;
     
     // Water
     config.params.quota_water_crop = parseFloat(document.getElementById('quota_water_crop').value);
@@ -126,6 +128,7 @@ function setupEventListeners() {
             document.getElementById('growth_pop').value = (scenarioData.growth_pop * 100).toFixed(1);
             document.getElementById('growth_gdp').value = (scenarioData.growth_gdp * 100).toFixed(1);
             document.getElementById('growth_urbanization').value = (scenarioData.growth_urbanization * 100).toFixed(1);
+            document.getElementById('growth_agri_yield').value = (scenarioData.growth_agri_yield * 100).toFixed(1);
         }
     });
 }
@@ -249,7 +252,7 @@ function updateCharts(results) {
         labels: years,
         datasets: [
             {
-                label: 'Emisiones CO₂',
+                label: 'Emisiones CO₂ (Mt)',
                 data: results.map(r => r.total_co2),
                 borderColor: '#8b5cf6',
                 backgroundColor: 'rgba(139, 92, 246, 0.1)',

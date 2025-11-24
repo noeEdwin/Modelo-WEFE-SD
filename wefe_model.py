@@ -24,6 +24,15 @@ class WEFEModel:
         self.state['population'] *= (1 + self.scenarios.get('growth_pop', 0))
         self.state['gdp'] *= (1 + self.scenarios.get('growth_gdp', 0))
         self.state['urbanization_rate'] += self.scenarios.get('growth_urbanization', 0)
+        
+        # Crecimiento tecnológico en agricultura (Rendimientos)
+        growth_yield = self.scenarios.get('growth_agri_yield', 0)
+        self.state['yield_grains'] *= (1 + growth_yield)
+        self.state['yield_veggies'] *= (1 + growth_yield)
+        self.state['yield_fruits'] *= (1 + growth_yield)
+        self.state['yield_meat'] *= (1 + growth_yield)
+        self.state['yield_poultry'] *= (1 + growth_yield)
+        self.state['yield_dairy'] *= (1 + growth_yield)
 
     def _step_food(self):
         """
@@ -98,26 +107,28 @@ class WEFEModel:
         # Total Demanda Humana (Consuntiva)
         wd_human = (wd_agri + wd_ind + wd_dom + wd_energy) / 1000000.0
         
-        # --- REQUERIMIENTO ECOLÓGICO ---
-        # No es demanda consuntiva, es una restricción a la oferta
+        # --- REQUERIMIENTO ECOLÓGICO (Eq 1) ---
+        # El paper (Ling et al., 2024) suma la demanda ecológica a la demanda total.
         wd_eco = s.get('wd_eco_req', 0)
+        
+        # Demanda Total = Demanda Humana + Demanda Ecológica
+        wd_total = wd_human + wd_eco
 
-        # --- OFERTA DISPONIBLE (WS) ---
-        # Oferta Total Natural
+        # --- OFERTA DISPONIBLE (WS) (Eq 6) ---
+        # Oferta Total Natural (Bruta)
         total_ws_natural = s['ws_surface'] + s['ws_ground'] + s['ws_unconventional']
         
-        # Oferta Disponible para Humanos = Natural - Ecológico
-        ws_available = total_ws_natural - wd_eco
-
-        # --- BALANCE (Wr) ---
-        # Ratio = Disponible / Demanda Humana
-        w_r = ws_available / wd_human if wd_human > 0 else 0
+        # --- BALANCE (Wr) (Eq 7) ---
+        # Ratio = Oferta Total / Demanda Total
+        # Nota: Al incluir wd_eco en la demanda, usamos la oferta bruta para el ratio.
+        w_r = total_ws_natural / wd_total if wd_total > 0 else 0
         
         return {
-            'water_demand': wd_human,     # Reportamos solo la demanda humana para la gráfica
-            'water_supply': ws_available, # Reportamos la oferta neta disponible
+            'water_demand': wd_human,     # Reportamos solo humana para coincidir con gráfica SQL (76k)
+            'water_supply': total_ws_natural, # Reportamos oferta bruta para coincidir con SQL (472k)
             'water_ratio': w_r,
-            'wd_eco': wd_eco
+            'wd_eco': wd_eco,
+            'wd_total_system': wd_total   # Guardamos el total real por si acaso
         }
 
     def _step_energy(self, water_metrics, food_metrics):
@@ -152,12 +163,26 @@ class WEFEModel:
         fossil_gap = total_ed - supply_renewables
 
         # 3. Si hay déficit, lo llenamos con fósiles manteniendo el mix de 2005
-        # Ratios 2005: Coal ~3.6%, Oil ~72.3%, Gas ~24.1% (Total Fossil = 8300 PJ)
+        # Ratios dinámicos basados en el estado inicial (config)
         if fossil_gap > 0:
-            # Definimos ratios fijos basados en el año base (podrían evolucionar en escenarios futuros)
-            ratio_coal = 300 / 8300
-            ratio_oil = 6000 / 8300
-            ratio_gas = 2000 / 8300
+            # Calcular ratios actuales basados en el consumo del año anterior (o inicial)
+            # Si es el primer paso, usa los del config.
+            # Para mantener la proporción fija del año base:
+            base_coal = self.state.get('es_coal_base', self.state['es_coal'])
+            base_oil = self.state.get('es_oil_base', self.state['es_oil'])
+            base_gas = self.state.get('es_gas_base', self.state['es_gas'])
+            
+            total_fossil_base = base_coal + base_oil + base_gas
+            
+            if total_fossil_base > 0:
+                ratio_coal = base_coal / total_fossil_base
+                ratio_oil = base_oil / total_fossil_base
+                ratio_gas = base_gas / total_fossil_base
+            else:
+                # Fallback si no hay datos base
+                ratio_coal = 0.05
+                ratio_oil = 0.60
+                ratio_gas = 0.35
             
             s['es_coal'] = fossil_gap * ratio_coal
             s['es_oil'] = fossil_gap * ratio_oil
@@ -195,23 +220,16 @@ class WEFEModel:
         # 1 PJ = 1000 TJ
         # Resultado en kg, dividimos entre 1000 para Toneladas
         
-        # Factor de conversión: PJ -> TJ (x1000)
-        # Factor de emisión: kg/TJ
-        # Resultado: kg. Para pasar a Toneladas: / 1000
-        # Neto: (PJ * 1000 * kg/TJ) / 1000 = PJ * kg/TJ = Toneladas?
-        # Espera: 1 PJ = 1000 TJ. 
-        # Emisiones = (Consumo_PJ * 1000) * Factor_kg_TJ = kg totales.
-        # Toneladas = kg / 1000.
-        # Entonces: (C * 1000 * F) / 1000 = C * F.
-        # Si Consumo=470 y Factor=99587 -> 46,805,890 Toneladas. (46 Mt).
-        # Esto suena correcto (México emite ~400-500 Mt total, carbón es poco).
-        
         co2_coal = energy_metrics['consumption_coal'] * p['emission_factor_coal']
         co2_oil = energy_metrics['consumption_oil'] * p['emission_factor_oil']
         co2_gas = energy_metrics['consumption_gas'] * p.get('emission_factor_gas', 0)
         
         # Convertimos de Toneladas a Megatoneladas (Mt)
-        total_co2 = (co2_coal + co2_oil + co2_gas) / 1000000.0
+        total_co2_energy = (co2_coal + co2_oil + co2_gas) / 1000000.0
+        
+        # Sumamos emisiones de otros sectores (No energéticos: Agricultura, Desechos, Industrial)
+        # Ajuste de calibración para igualar el total nacional
+        total_co2 = total_co2_energy + p.get('co2_non_energy', 0)
         
         # --- COD (Eq 21-22) ---
         # Contaminación del agua
@@ -247,8 +265,10 @@ class WEFEModel:
             # ya existen regiones críticas sobreexplotando acuíferos.
             if water_res['water_ratio'] < 3.0:
                 # No restamos el déficit nacional (que es negativo o cero),
-                # sino un "Factor de Estrés Regional" (ej. 20% de la demanda se saca de pozos sobreexplotados)
-                factor_regional = 0.20
+                # sino un "Factor de Estrés Regional" muy suave.
+                # Antes: 0.20 (20%) -> Causaba colapso irreal.
+                # Ahora: 0.005 (0.5%) -> Simula degradación lenta y realista.
+                factor_regional = 0.005
                 extraccion_insostenible = water_res['water_demand'] * factor_regional
                 self.state['ws_ground'] -= extraccion_insostenible
                 

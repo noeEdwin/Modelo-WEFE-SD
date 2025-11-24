@@ -350,3 +350,41 @@ Aquí tienes el control total. Puedes modificar las variables clave para pregunt
 2.  Cambia algo (ej. aumenta el PIB).
 3.  Haz clic en **"Agregar a Comparación"**.
 4.  Verás una tabla comparativa abajo para entender exactamente cuánto cambió el CO2 o el Agua con tu decisión.
+
+---
+
+## 📈 Parte 5: Análisis de Resultados y Deducciones (Simulación a 2035)
+
+Al ejecutar el modelo proyectado a 30 años (2005-2035), obtuvimos los siguientes resultados para cada escenario. Esto nos permite entender las "palancas" más sensibles del sistema mexicano.
+
+| Escenario | Población | PIB (Billones) | Seguridad Alimentaria | Emisiones CO2 | Estado Final |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Base** | 156 M | $39.7 T | 1.34 (Seguro) | 749 Mt | **Estable pero Contaminante.** |
+| **Optimista** | 139 M | $53.1 T | 1.64 (Excedente) | 929 Mt | **Rico pero Sucio.** |
+| **Pesimista** | 176 M | $29.6 T | **0.83 (Crisis)** | 614 Mt | **Colapso Alimentario.** |
+| **Sostenible**| 131 M | $43.3 T | 1.60 (Excelente) | 787 Mt | **Equilibrio Humano.** |
+
+### ¿Qué deducimos de cada caso?
+
+#### 1. Escenario Base (Tendencia Histórica)
+*   **Resultado:** México crece inercialmente. La comida alcanza, pero las emisiones de CO2 siguen subiendo.
+*   **Deducción:** Seguir "como vamos" no provoca un colapso inmediato, pero nos aleja de las metas climáticas. Es un camino de "supervivencia sin mejora".
+
+#### 2. Escenario Optimista (Tecnología + Economía)
+*   **Resultado:** El PIB se dispara y la población se frena. Esto genera un **excedente masivo de alimentos** (Ratio 1.64). Sin embargo, la industria consume tanta energía que el **CO2 se dispara a niveles récord** (929 Mt).
+*   **Deducción:** El crecimiento económico por sí solo es peligroso para el ambiente. Ser un país rico no sirve si el aire es irrespirable. **Lección:** El crecimiento del PIB debe ir acompañado obligatoriamente de una transición a energías renovables, o el cambio climático se acelerará.
+
+#### 3. Escenario Pesimista (Estancamiento + Sobrepoblación)
+*   **Resultado:** La pesadilla. La población crece sin control (176 M) y la economía se estanca. El sistema de alimentos **COLAPSA** (Ratio 0.83), lo que significa hambruna o dependencia masiva de importaciones. Curiosamente, es el que menos contamina, pero por las razones incorrectas (pobreza).
+*   **Deducción:** La **Población** es la variable más crítica para la supervivencia básica. Si no controlamos la demografía, ninguna tecnología agrícola será suficiente para alimentarnos.
+
+#### 4. Escenario Sostenible (Eficiencia)
+*   **Resultado:** Logra lo mejor de dos mundos: alto PIB ($43 T) y alta seguridad alimentaria, gracias a una población controlada (131 M). Aunque emite más CO2 que el base (por la mayor actividad industrial), es más eficiente per cápita.
+*   **Deducción:** El control demográfico es la política de sostenibilidad más efectiva a largo plazo. Permite mayor riqueza y bienestar con menor presión sobre los recursos.
+
+### Conclusión General
+El modelo nos enseña que **no existen soluciones mágicas**.
+*   Si quieres riqueza (**Optimista**), sacrificas el aire (CO2).
+*   Si descuidas la planificación familiar (**Pesimista**), sacrificas la comida.
+*   El camino **Sostenible** requiere un balance delicado: frenar la población para permitir que la economía crezca sin colapsar los recursos básicos.
+

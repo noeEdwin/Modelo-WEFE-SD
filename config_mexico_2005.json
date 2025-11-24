@@ -12,12 +12,12 @@
     "heads_poultry": 293612115,
     "heads_dairy": 2197346,
 
-    "yield_grains": 7.18, 
-    "yield_veggies": 17.19, 
-    "yield_fruits": 12.38,
-    "yield_meat": 0.103, 
-    "yield_poultry": 0.00175, 
-    "yield_dairy": 3.25,
+    "yield_grains": 2.395, 
+    "yield_veggies": 20.39, 
+    "yield_fruits": 10.57,
+    "yield_meat": 0.1545, 
+    "yield_poultry": 0.002625, 
+    "yield_dairy": 4.56,
 
     "ws_surface": 395210.0,
     "ws_ground": 76984.0,
@@ -53,12 +53,14 @@
     "emission_factor_coal": 99587.5,
     "emission_factor_oil": 85265.7,
     "emission_factor_gas": 43006.7,
-    "pollutant_concentration_dom": 0.0463
+    "pollutant_concentration_dom": 0.0463,
+    "co2_non_energy": 160.0
   },
 
   "scenarios": {
     "growth_pop": 0.0115,
     "growth_gdp": 0.01,
-    "growth_urbanization": 0.0176
+    "growth_urbanization": 0.0176,
+    "growth_agri_yield": 0.022
   }
 }
