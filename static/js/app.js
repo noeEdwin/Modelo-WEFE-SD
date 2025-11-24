@@ -152,6 +152,8 @@ function updateSummaryCards(summary) {
     document.getElementById('waterRatio').textContent = summary.final_water_ratio.toFixed(2);
     document.getElementById('foodRatio').textContent = summary.final_food_ratio.toFixed(2);
     document.getElementById('energyRatio').textContent = summary.final_energy_ratio.toFixed(2);
+    document.getElementById('energyDemandValue').textContent = formatNumber(summary.final_energy_demand);
+    document.getElementById('energySupplyValue').textContent = formatNumber(summary.final_energy_supply);
     document.getElementById('co2Total').textContent = formatNumber(summary.total_co2_emissions);
 }
 

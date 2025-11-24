@@ -36,6 +36,11 @@ def print_variable_table(var_name, real_values, sim_values, years):
     for i, year in enumerate(years):
         real = real_values[i]
         sim = sim_values[i]
+        
+        if pd.isna(real):
+            print(f"{year:<6} | {'N/A':>15} | {sim:>15,.2f} | {'N/A':>15} | {'N/A':>10}")
+            continue
+
         diff = sim - real
         error_pct = abs(diff / real) * 100 if real != 0 else 0
         errors.append(error_pct)
@@ -107,6 +112,22 @@ def main():
         "EMISIONES CO2 (Megatoneladas)",
         real_df['emisiones_co2_real'].values,
         sim_df['total_co2'].values,
+        years
+    )
+
+    # 7. DEMANDA DE ENERGÍA
+    print_variable_table(
+        "DEMANDA DE ENERGÍA (PJ)",
+        real_df['consumo_energia_real'].values,
+        sim_df['energy_demand'].values,
+        years
+    )
+
+    # 8. OFERTA DE ENERGÍA
+    print_variable_table(
+        "OFERTA DE ENERGÍA (PJ)",
+        real_df['oferta_energia_real'].values,
+        sim_df['energy_supply'].values,
         years
     )
     

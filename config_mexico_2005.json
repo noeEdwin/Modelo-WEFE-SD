@@ -50,17 +50,22 @@
     "energy_intensity_agri": 0.000002103,
     "straw_energy_factor": 0.000003,
 
-    "emission_factor_coal": 99587.5,
-    "emission_factor_oil": 85265.7,
-    "emission_factor_gas": 43006.7,
+    "emission_factor_coal": 85000.0,
+    "emission_factor_oil": 74000.0,
+    "emission_factor_gas": 37000.0,
     "pollutant_concentration_dom": 0.0463,
-    "co2_non_energy": 160.0
+    "co2_non_energy": 100.0,
+    "growth_co2_non_energy": 0.012,
+    "growth_co2_non_energy_post_2013": 0.015
   },
 
   "scenarios": {
     "growth_pop": 0.0115,
     "growth_gdp": 0.01,
     "growth_urbanization": 0.0176,
-    "growth_agri_yield": 0.022
+    "growth_agri_yield": 0.022,
+    "growth_energy_supply": 0.0023,
+    "growth_energy_supply_post_2013": -0.0716,
+    "energy_transition_year": 2013
   }
 }

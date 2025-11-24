@@ -91,6 +91,8 @@ def simulate():
             'final_water_ratio': float(resultados['water_ratio'].iloc[-1]),
             'final_food_ratio': float(resultados['food_ratio'].iloc[-1]),
             'final_energy_ratio': float(resultados['energy_ratio'].iloc[-1]),
+            'final_energy_demand': float(resultados['energy_demand'].iloc[-1]),
+            'final_energy_supply': float(resultados['energy_supply'].iloc[-1]),
             'total_co2_emissions': float(resultados['total_co2'].sum()),
             'avg_water_stress': float(resultados['water_ratio'].mean())
         }

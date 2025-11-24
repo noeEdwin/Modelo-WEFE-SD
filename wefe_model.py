@@ -151,49 +151,60 @@ class WEFEModel:
         
         total_ed = ed_ind + ed_dom + ed_water + ed_agri
 
-        # --- OFERTA (ES) ---
-        # Eq 13: Fósiles + Renovables (Ahora dinámico)
-        # 1. Calculamos primero la oferta renovable disponible
-        # Eq 14: Bioenergía (Paja de cultivos)
+        # --- OFERTA (ES) - MODELO CALIBRADO CON CRECIMIENTO POR TRAMOS ---
+        # La oferta de energía tiene dos períodos distintos reflejando la realidad mexicana:
+        # Período 1 (2005-2013): Estabilidad (+0.23% anual)
+        # Período 2 (2014-2020): Caída acelerada (-7.16% anual) - reforma energética
+        
+        transition_year = self.scenarios.get('energy_transition_year', 2013)
+        
+        if s['year'] <= transition_year:
+            # Período estable
+            growth_rate = self.scenarios.get('growth_energy_supply', 0.0023)
+        else:
+            # Período de caída acelerada
+            growth_rate = self.scenarios.get('growth_energy_supply_post_2013', -0.0716)
+        
+        s['energy_production_total'] *= (1 + growth_rate)
+        
+        # Eq 14: Bioenergía (Paja de cultivos) - componente renovable variable
         bioenergy = food_metrics['production_grains'] * p.get('straw_energy_factor', 0)
         supply_renewables = s['es_renewables'] + bioenergy
-
-        # 2. Calculamos el déficit que deben cubrir los fósiles
-        # Gap = Demanda Total - Renovables
-        fossil_gap = total_ed - supply_renewables
-
-        # 3. Si hay déficit, lo llenamos con fósiles manteniendo el mix de 2005
-        # Ratios dinámicos basados en el estado inicial (config)
-        if fossil_gap > 0:
-            # Calcular ratios actuales basados en el consumo del año anterior (o inicial)
-            # Si es el primer paso, usa los del config.
-            # Para mantener la proporción fija del año base:
-            base_coal = self.state.get('es_coal_base', self.state['es_coal'])
-            base_oil = self.state.get('es_oil_base', self.state['es_oil'])
-            base_gas = self.state.get('es_gas_base', self.state['es_gas'])
-            
-            total_fossil_base = base_coal + base_oil + base_gas
-            
-            if total_fossil_base > 0:
-                ratio_coal = base_coal / total_fossil_base
-                ratio_oil = base_oil / total_fossil_base
-                ratio_gas = base_gas / total_fossil_base
-            else:
-                # Fallback si no hay datos base
-                ratio_coal = 0.05
-                ratio_oil = 0.60
-                ratio_gas = 0.35
-            
-            s['es_coal'] = fossil_gap * ratio_coal
-            s['es_oil'] = fossil_gap * ratio_oil
-            s['es_gas'] = fossil_gap * ratio_gas
+        
+        # La oferta total está limitada por la capacidad de producción
+        # No puede exceder energy_production_total
+        total_es = s['energy_production_total']
+        
+        # Distribución de la oferta entre fuentes (manteniendo proporciones históricas)
+        # Basado en los valores base del año 2005
+        base_coal = self.state.get('es_coal_base', self.state.get('es_coal', 470.039))
+        base_oil = self.state.get('es_oil_base', self.state.get('es_oil', 3414.267))
+        base_gas = self.state.get('es_gas_base', self.state.get('es_gas', 2453.568))
+        
+        # Guardar valores base en el primer paso
+        if 'es_coal_base' not in self.state:
+            self.state['es_coal_base'] = base_coal
+            self.state['es_oil_base'] = base_oil
+            self.state['es_gas_base'] = base_gas
+        
+        total_fossil_base = base_coal + base_oil + base_gas
+        
+        if total_fossil_base > 0:
+            ratio_coal = base_coal / total_fossil_base
+            ratio_oil = base_oil / total_fossil_base
+            ratio_gas = base_gas / total_fossil_base
         else:
-            # Si sobran renovables (futuro utópico), apagamos fósiles
-            s['es_coal'] = 0
-            s['es_oil'] = 0
-            s['es_gas'] = 0
-
-        total_es = s['es_coal'] + s['es_oil'] + s['es_gas'] + supply_renewables
+            # Fallback basado en mix energético de México
+            ratio_coal = 0.066  # ~6.6%
+            ratio_oil = 0.481   # ~48.1%
+            ratio_gas = 0.346   # ~34.6%
+        
+        # Oferta de fósiles = Producción total - Renovables
+        fossil_supply = max(0, total_es - supply_renewables)
+        
+        s['es_coal'] = fossil_supply * ratio_coal
+        s['es_oil'] = fossil_supply * ratio_oil
+        s['es_gas'] = fossil_supply * ratio_gas
         
         # --- BALANCE (Er) ---
         # Eq 15
@@ -215,7 +226,7 @@ class WEFEModel:
         s = self.state
         p = self.params
         
-        # --- CO2 (Eq 23-24) ---
+        # --- CO2 (Eq 23-24) - MODELO CALIBRADO CON CRECIMIENTO POR TRAMOS ---
         # Emisiones = Consumo (PJ) * Factor (kg/TJ)
         # 1 PJ = 1000 TJ
         # Resultado en kg, dividimos entre 1000 para Toneladas
@@ -227,9 +238,25 @@ class WEFEModel:
         # Convertimos de Toneladas a Megatoneladas (Mt)
         total_co2_energy = (co2_coal + co2_oil + co2_gas) / 1000000.0
         
-        # Sumamos emisiones de otros sectores (No energéticos: Agricultura, Desechos, Industrial)
-        # Ajuste de calibración para igualar el total nacional
-        total_co2 = total_co2_energy + p.get('co2_non_energy', 0)
+        # CO2 no energético también tiene crecimiento por tramos
+        # Inicializar el estado de CO2 no energético si no existe
+        if 'co2_non_energy_current' not in s:
+            s['co2_non_energy_current'] = p.get('co2_non_energy', 0)
+        
+        # Aplicar crecimiento al CO2 no energético
+        transition_year = self.scenarios.get('energy_transition_year', 2013)
+        
+        if s['year'] <= transition_year:
+            # Período de crecimiento (2005-2013)
+            growth_rate_non_energy = p.get('growth_co2_non_energy', 0.0128)
+        else:
+            # Período de declinación (2014+)
+            growth_rate_non_energy = p.get('growth_co2_non_energy_post_2013', -0.0192)
+        
+        s['co2_non_energy_current'] *= (1 + growth_rate_non_energy)
+        
+        # Sumamos emisiones energéticas y no energéticas
+        total_co2 = total_co2_energy + s['co2_non_energy_current']
         
         # --- COD (Eq 21-22) ---
         # Contaminación del agua
@@ -300,7 +327,9 @@ class WEFEModel:
             'water_demand':      'demanda_agua_total',
             'total_co2':         'emisiones_co2_real',
             # Sumamos las producciones reales para comparar con el total simulado
-            'food_supply_total': ['prod_granos_real', 'prod_hortalizas_real', 'prod_frutas_real', 'prod_carne_real', 'prod_lacteos_real'] 
+            'food_supply_total': ['prod_granos_real', 'prod_hortalizas_real', 'prod_frutas_real', 'prod_carne_real', 'prod_lacteos_real'],
+            'energy_demand':     'consumo_energia_real',
+            'energy_supply':     'oferta_energia_real'
         }
         
         for var_sim, var_db in mapa_vars.items():

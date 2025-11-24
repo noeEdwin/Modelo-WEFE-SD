@@ -1,0 +1,90 @@
+﻿Sistema de Información Energética,,,,,,,,,,,,,
+Secretaría de Energía,,,,,,,,,,,,,
+Dirección General de Planeación e Información Energéticas,,,,,,,,,,,,,
+,,,,,,,,,,,,,
+,,,,,,,,,,,,,
+Balance Nacional de Energía: Por fuente de energía primaria,,,,,,,,,,,,,
+,,,,,,,,,,,,,
+(petajoules),,,,,,,,,,,,,
+,,,,,,,,,,,,,
+,Carbón,Petróleo crudo,Condensados,Gas natural,Nucleo-energía,Hidro-energía,Geoenergía,Energía solar,Energía eólica,Bagazo de caña,Leña,Biogás,Total de energía primaria
+2017,,,,,,,,,,,,,
+,,,,,,,,,,,,,
+Producción,308.240,4354.890,67.283,1518.428,113.219,114.652,127.426,15.156,38.231,116.869,250.308,2.520,7027.223
+De otras fuentes,0,0,0,944.196,0,0,0,0,0,0,0,0,944.196
+Gas residual de plantas de gas,0,0,0,467.994,0,0,0,0,0,0,0,0,467.994
+Gas de formación empleado por PEP,0,0,0,476.202,0,0,0,0,0,0,0,0,476.202
+Importación,301.221,0.000,0,0,0,0,0,0,0,0,0,0,301.221
+Variación de inventarios,-4.531,-24.425,1.946,-3.913,0,0,0,0,0,0,0,0,-30.923
+Oferta total,604.930,4330.465,69.229,2458.712,113.219,114.652,127.426,15.156,38.231,116.869,250.308,2.520,8241.716
+Exportación,-0.078,-2609.262,0.000,0,0,0,0,0,0,0,0,0,-2609.339
+No aprovechada,0,0.000,0.000,-94.933,0,0,0,0,0,-1.286,0,0,-96.219
+Maquila-intercambio neto,0,0.000,0,0,0,0,0,0,0,0,0,0,0.000
+Oferta interna bruta,604.852,1721.204,69.229,2363.778,113.219,114.652,127.426,15.156,38.231,115.584,250.308,2.520,5536.158
+,,,,,,,,,,,,,
+Total transformación,-367.409,-1718.167,-69.229,-1430.565,-113.219,-114.652,-127.426,-15.156,-38.231,-65.455,0,-2.520,-4062.028
+Coquizadoras,-50.816,0,0,0,0,0,0,0,0,0,0,0,-50.816
+Refinerías y despuntadoras,0,-1718.167,-2.588,0,0,0,0,0,0,0,0,0,-1720.755
+Plantas de gas y fraccionadoras,0,0,-66.641,-1430.565,0,0,0,0,0,0,0,0,-1497.206
+Centrales eléctricas CFE,-316.550,0,0,0,-113.219,-108.251,-124.193,-0.039,-0.377,0,0,0,-662.629
+Centrales eléctricas PEMEX,0,0,0,0,0,0,0,0,0,0,0,0,0
+Centrales eléctricas PIE,0,0,0,0,0,0,0,0,-6.738,0,0,0,-6.738
+Centrales eléctricas Autoabasto,-0.043,0,0,0,0,-2.909,-3.233,-3.652,-31.101,-63.833,0,-2.265,-107.037
+Centrales eléctricas de Pequeños Productores,0,0,0,0,0,0.000,0,0.000,0.000,0,0,0,0.000
+Centrales eléctricas de Cogeneración,0,0,0,0,0,0,0,0,0,0.000,0,0.000,0.000
+Centrales eléctricas con Modalidad de Generación (LIE),0,0,0,0,0,-3.492,0,-0.580,-0.015,-1.622,0,-0.255,-5.963
+Centrales eléctricas UPC,0,0,0,0,0,0,0,0,0,0.000,0,0,0.000
+Generación Distribuida,0,0,0,0,0,0,0,,0,0,0,0,
+,,,,,,,,,,,,,
+Consumo propio del sector,0.000,0.000,0.000,-305.556,0,0,0,0,0,0,0,0,-305.556
+Transferencias interproductos,0,0,0,-151.455,0,0,0,0,0,0,0,0,-151.455
+Recirculaciones,0,0,0,-476.202,0,0,0,0,0,0,0,0,-476.202
+Diferencia estadística,0.000,3.566,0.000,0.000,0.000,0.000,0.000,0,0.000,0.000,0.000,0,0.000
+"Pérdidas (transp.,dist. y almac)",0,-6.602,0.000,0.000,0,0,0,0,0,0,0,0,-6.602
+,,,,,,,,,,,,,
+Consumo final total,237.443,0,0,0,0,0,0,10.888,0,50.128,250.308,0,548.768
+,,,,,,,,,,,,,
+Consumo final no energético,0,0,0,0,0,0,0,0,0,0.236,0,0,0.236
+Petroquímica de Pemex,0,0,0,0,0,0,0,0,0,0,0,0,0
+Otras ramas económicas,0,0,0,0,0,0,0,0,0,0.236,0,0,0.236
+,,,,,,,,,,,,,
+Consumo final energético,237.443,0,0,0,0,0,0,10.888,0,49.893,250.308,0,548.532
+,,,,,,,,,,,,,
+"Residencial, comercial y público",0,0,0,0,0,0,0,10.290,0,0,250.308,0,260.598
+Residencial,0,0,0,0,0,0,0,6.420,0,0,250.308,0,256.728
+Comercial,0,0,0,0,0,0,0,3.870,0,0,0,0,3.870
+Público,0,0,0,0,0,0,0,0,0,0,0,0,0
+,,,,,,,,,,,,,
+Transporte,0,0,0,0,0,0,0,0,0,0,0,0,0
+Aéreo,0,0,0,0,0,0,0,0,0,0,0,0,0
+Autotransporte,0,0,0,0,0,0,0,0,0,0,0,0,0
+Eléctrico,0,0,0,0,0,0,0,0,0,0,0,0,0
+Ferroviario,0,0,0,0,0,0,0,0,0,0,0,0,0
+Marítimo,0,0,0,0,0,0,0,0,0,0,0,0,0
+,,,,,,,,,,,,,
+Agropecuario,0,0,0,0,0,0,0,0,0,0,0,0,0
+,,,,,,,,,,,,,
+Industrial,237.443,0,0,0,0,0,0,0.598,0,49.893,0,0,287.934
+"212.- Minería de minerales metálicos y no metálicos, excepto petróleo y gas",0,0,0,0,0,0,0,0,0,0,0,0,0
+236.- Edificación,0,0,0,0,0,0,0,0,0,0,0,0,0
+311.- Industria alimentaria,0,0,0,0,0,0,0,0,0,43.797,0,0,43.797
+312.- Industria de las bebidas y del tabaco,0,0,0,0,0,0,0,0,0,0,0,0,0
+313.- Fabricación de insumos textiles y acabados textiles,0,0,0,0,0,0,0,0,0,0,0,0,0
+322.-Industria del papel,0.000,0,0,0,0,0,0,0,0,0.000,0,0,0.000
+325.- Industria química,0,0,0,0,0,0,0,0,0,0,0,0,0
+326.- Industria del plástico y del hule,0,0,0,0,0,0,0,0,0,0,0,0,0
+327.-Fabricación de productos a base de minerales no metálicos,7.055,0,0,0,0,0,0,0,0,0,0,0,7.055
+331.- Industrias metálicas básicas,0,0,0,0,0,0,0,0,0,0,0,0,0
+"334.-Fabricación de equipo de computación, comunicación, medición y de otros equipos, componentes y accesorios electrónico",0,0,0,0,0,0,0,0,0,0,0,0,0
+"335.-Fabricación de accesorios, aparatos eléctricos y equipo de generación de energía eléctrica",0,0,0,0,0,0,0,0,0,0,0,0,0
+336.-Fabricación de equipo de transporte,0,0,0,0,0,0,0,0,0,0,0,0,0
+339.- Otras industrias manufactureras,0,0,0,0,0,0,0,0,0,0,0,0,0
+Petroquímica de PEMEX (energético),0,0,0,0,0,0,0,0,0,0,0,0,0
+Otras ramas,230.388,0,0,0,0,0,0,0.598,0,6.096,0,0,237.082
+,,,,,,,,,,,,,
+Notas:,,,,,,,,,,,,,
+La suma de los parciales puede no coincidir con los totales debido al redondeo de las cifras.,,,,,,,,,,,,,
+La generación de electricidad mediante módulos fotovoltáicos se consideró como centrales eléctricas autogeneración.,,,,,,,,,,,,,
+,,,,,,,,,,,,,
+Fuente: Sistema de Información Energética (SIE) con información de SENER,,,,,,,,,,,,,
+La información de 2023 es preliminar.,,,,,,,,,,,,,
