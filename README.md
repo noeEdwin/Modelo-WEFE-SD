@@ -61,11 +61,6 @@ Aunque nos basamos en el modelo de *Ling et al. (2024)*, hemos realizado adaptac
 *   **Nuestra Solución:** Implementamos una lógica de **degradación de acuíferos**. Si el estrés hídrico nacional (`water_ratio`) es "saludable" pero menor a 3.0 (un umbral de seguridad), asumimos que existen regiones críticas que ya están sobreexplotando sus reservas.
 *   **En el código:** Reducimos la reserva de agua subterránea (`ws_ground`) un **0.5% anual** cuando el ratio es < 3.0. Esto simula el agotamiento progresivo de los acuíferos en zonas áridas, incluso si el "promedio" nacional parece seguro.
 
-### 2. Caudal Ecológico Explícito
-*   **El Problema:** Muchos modelos asumen que toda el agua del río está disponible para humanos.
-*   **Nuestra Solución:** Restamos explícitamente el **Caudal Ecológico** (30% de la oferta natural) antes de calcular el agua disponible para consumo.
-*   **Justificación:** Basado en el método de Tennant, reservamos agua para que los ríos sigan vivos. Esto hace que nuestra "Oferta Disponible" sea menor a la cifra bruta de CONAGUA, pero más realista ecológicamente.
-
 ### 3. Demanda de Granos para Ganado (Feed)
 *   **El Problema:** Ignorar lo que comen las vacas subestima masivamente la demanda agrícola.
 *   **Nuestra Solución:** Calculamos explícitamente la demanda de alimento animal (`fd_feed_meat`, `fd_feed_dairy`) usando factores de conversión (ej. 3.5 kg de grano por kg de carne).
