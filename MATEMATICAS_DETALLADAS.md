@@ -4,6 +4,9 @@ Este documento contiene las derivaciones matemáticas completas y explicaciones 
 
 Para la documentación general del proyecto, consulta [`README.md`](file:///home/edwinnoe/SIMULACION_PROYECTO/README.md).
 
+> [!NOTE]
+> **Referencias de Líneas de Código:** Los números de línea mencionados en este documento son aproximados y pueden variar ligeramente con actualizaciones del código. Las referencias a funciones (ej. `_step_water`, `_step_food`) son precisas y permanentes.
+
 ---
 
 ## 📐 Tabla de Contenidos

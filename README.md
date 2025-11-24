@@ -207,56 +207,293 @@ El modelo implementa **25 ecuaciones** del paper de Ling et al. (2024), distribu
 
 ---
 
-## 🎮 Parte Final: Guía de Uso y Escenarios
+## 🎮 Parte Final: Guía de Uso de la Interfaz Web
 
-Hemos desarrollado una interfaz web interactiva para que explores el futuro de México. Aquí te explicamos cómo usarla y qué significan los escenarios.
+Hemos desarrollado una interfaz web interactiva para que explores diferentes escenarios futuros de México. Esta sección te explica paso a paso cómo usarla.
 
-### 1. Los Escenarios Simulados
-El sistema viene con 4 futuros posibles pre-cargados. Puedes seleccionarlos en el menú superior.
+### 1. Iniciar el Servidor
+
+Para ejecutar la aplicación web:
+
+```bash
+cd /home/edwinnoe/SIMULACION_PROYECTO
+python3 app.py
+```
+
+Luego abre tu navegador en: **http://localhost:5000**
+
+---
+
+### 2. Panel de Configuración del Modelo
+
+El panel izquierdo te permite controlar los parámetros de simulación. La interfaz ha sido simplificada para mostrar **solo las variables con las que puedes experimentar** y que tienen impacto directo en los resultados.
+
+#### ⏱️ Parámetros de Simulación
+
+**Años de Simulación**
+- **Qué es:** Número de años hacia el futuro que quieres simular (1-100)
+- **Valor por defecto:** 30 años (2005-2035)
+- **Impacto:** Determina qué tan lejos en el futuro quieres proyectar el modelo
+
+#### 📈 Escenarios de Crecimiento
+
+Estas son las 4 variables dinámicas que controlan cómo evoluciona el sistema año con año:
+
+**1. Crecimiento Poblacional (%)**
+- **Qué es:** Tasa de crecimiento anual de la población
+- **Valor por defecto:** 1.4% (valor histórico de México)
+- **Impacto en el modelo:**
+  - ⬆️ Más población = Mayor demanda de agua doméstica (Ecuación 4)
+  - ⬆️ Más población = Mayor demanda de alimentos (Ecuación 17)
+  - ⬆️ Más población = Mayor demanda de energía doméstica (Ecuación 11)
+- **Ejemplo:** Si subes a 2%, el ratio de seguridad alimentaria caerá porque más personas consumen los mismos recursos
+
+**2. Crecimiento PIB (%)**
+- **Qué es:** Tasa de crecimiento anual de la economía
+- **Valor por defecto:** 2.5% (tendencia histórica)
+- **Impacto en el modelo:**
+  - ⬆️ Más PIB = Mayor demanda industrial de agua (Ecuación 3)
+  - ⬆️ Más PIB = Mayor demanda industrial de energía (Ecuación 10)
+  - ⬆️ Más PIB + energía fósil = Mayores emisiones de CO₂ (Ecuación 23)
+- **Ejemplo:** Si subes a 4% (crecimiento alto), verás que el consumo energético se dispara y las emisiones aumentan dramáticamente
+
+**3. Crecimiento Urbanización (%)**
+- **Qué es:** Tasa de cambio anual en la proporción de población urbana vs rural
+- **Valor por defecto:** 0.4% (urbanización gradual)
+- **Impacto en el modelo:**
+  - Actualiza la variable `urbanization_rate` año con año
+  - Afecta indirectamente patrones de consumo de agua y energía
+- **Ejemplo:** Mayor urbanización concentra la demanda de servicios en ciudades
+
+**4. Crecimiento Rendimiento Agrícola (%)**
+- **Qué es:** Tasa de mejora tecnológica anual en la productividad agrícola
+- **Valor por defecto:** 2.2% (mejora histórica observada 2005-2020)
+- **Impacto en el modelo:**
+  - ⬆️ Mejora TODOS los rendimientos: granos, hortalizas, frutas, carne, lácteos
+  - ⬆️ Más producción por hectárea/cabeza = Mejor seguridad alimentaria (Ecuación 20)
+  - Esta variable captura la innovación agrícola (mejores semillas, técnicas, etc.)
+- **Ejemplo:** Si subes a 3%, el ratio de alimentos mejorará y México podría exportar excedentes
+
+> [!IMPORTANT]
+> **Variables NO Modificables:** Los parámetros técnicos del modelo (población inicial, PIB base 2005, cuotas de agua, factores de emisión) están calibrados con datos históricos y NO aparecen en la interfaz. Estos se cargan automáticamente desde `config_mexico_2005.json`.
+
+---
+
+### 3. Escenarios Predefinidos
+
+El menú desplegable superior te permite cargar 4 escenarios pre-configurados:
 
 #### 🟢 Escenario Base (2005)
-*   **Qué es:** La tendencia histórica "Business as Usual".
-*   **Variables:** Crecimiento poblacional moderado (1.4%), PIB moderado (2.5%).
-*   **Qué pasa:** Refleja lo que ha pasado históricamente. Es nuestro punto de control.
+- **Descripción:** Tendencia histórica "Business as Usual"
+- **Variables:** 
+  - Población: 1.15%
+  - PIB: 2.5%
+  - Urbanización: 0.4%
+  - Rendimiento agrícola: 2.2%
+- **Interpretación:** Continuar como vamos. Refleja el pasado reciente de México.
 
-#### 🚀 Escenario Optimista
-*   **Qué es:** Un futuro de alto desarrollo tecnológico y económico.
-*   **Cambios:** Alto crecimiento del PIB (3.5%), menor crecimiento poblacional (1.0%) y mayor urbanización.
-*   **Resultado Esperado:** La gente es más rica, pero la demanda de energía y agua se dispara por la industria. Si no hay renovables, las emisiones aumentan.
+#### 🚀 Escenario Optimista + Tecnológico
+- **Descripción:** Alto crecimiento económico con innovación
+- **Variables:**
+  - Población: 1.0% (menor, por desarrollo)
+  - PIB: 4.0% ⬆️ (economía fuerte)
+  - Urbanización: 0.6% ⬆️
+  - Rendimiento agrícola: 3.5% ⬆️ (tecnología avanzada)
+- **Resultado Esperado:** Excedente de alimentos, pero emisiones de CO₂ récord si no hay transición energética
 
-#### 📉 Escenario Pesimista
-*   **Qué es:** Estancamiento y crisis.
-*   **Cambios:** Bajo PIB (1.5%), alta población (1.8%).
-*   **Resultado Esperado:** Pobreza económica pero alta presión demográfica sobre los alimentos y el agua básica. Riesgo de crisis alimentaria.
+#### 📉 Escenario Pesimista + Crisis
+- **Descripción:** Estancamiento económico con sobrepoblación
+- **Variables:**
+  - Población: 1.8% ⬆️ (alta natalidad)
+  - PIB: 1.2% ⬇️ (crisis económica)
+  - Urbanización: 0.2% ⬇️
+  - Rendimiento agrícola: 0.8% ⬇️ (poca inversión)
+- **Resultado Esperado:** ⚠️ Crisis alimentaria (Ratio < 1.0), estrés hídrico, pero bajas emisiones por pobreza
 
-#### 🌱 Escenario Sostenible
-*   **Qué es:** El futuro ideal.
-*   **Cambios:** Crecimiento poblacional bajo (0.8%), PIB estable (2.8%), pero con enfoque en eficiencia (ajustable en parámetros).
-*   **Resultado Esperado:** Se busca mantener el bienestar reduciendo el impacto hídrico y de carbono.
+#### 🌱 Escenario Sostenible + Verde
+- **Descripción:** Balance entre desarrollo y sustentabilidad
+- **Variables:**
+  - Población: 0.8% ⬇️ (planificación familiar)
+  - PIB: 2.8% (crecimiento moderado)
+  - Urbanización: 0.5%
+  - Rendimiento agrícola: 3.0% ⬆️ (agricultura de precisión)
+- **Resultado Esperado:** Equilibrio entre bienestar económico y presión sobre recursos
 
-### 2. Cómo usar la Interfaz
+---
 
-#### Panel de Configuración (Izquierda)
-Aquí tienes el control total. Puedes modificar las variables clave para preguntar "¿Qué pasaría si...?":
-*   **Parámetros Socioeconómicos:** Cambia la población inicial o el PIB para ver el efecto escala.
-*   **Tasas de Crecimiento:** Ajusta qué tan rápido crece el país.
-    *   *Tip:* Sube el `Crecimiento PIB` y verás cómo se dispara la demanda de energía industrial.
-    *   *Tip:* Sube el `Crecimiento Poblacional` y verás caer el `Ratio Alimentos` (menos comida por persona).
-*   **Subsistema Agua/Energía:**
-    *   `Cuota Agua Agrícola`: Si bajas esto (tecnificación de riego), verás cómo se alivia el estrés hídrico.
-    *   `Factores de Emisión`: Si cambias esto, simulas el uso de combustibles más sucios o limpios.
+### 4. Panel de Resultados - Tarjetas de Resumen
 
-#### Panel de Resultados (Derecha)
-*   **Tarjetas de Resumen:** Te dan el diagnóstico final al año 2035 (o el que elijas).
-    *   **Ratios < 1.0:** ¡Peligro! La demanda supera a la oferta.
-*   **Gráficas:** Muestran la evolución año con año.
-    *   Observa las líneas de **Oferta vs Demanda**. El punto donde se cruzan es el año del colapso.
+Después de ejecutar la simulación, aparecen 4 tarjetas en la parte superior que resumen el estado final del sistema:
 
-#### Comparación
-1.  Corre una simulación base.
-2.  Cambia algo (ej. aumenta el PIB).
-3.  Haz clic en **"Agregar a Comparación"**.
-4.  Verás una tabla comparativa abajo para entender exactamente cuánto cambió el CO2 o el Agua con tu decisión.
+#### 💧 Ratio Agua Final
+**Qué muestra:** El balance entre oferta y demanda de agua al final de la simulación
+
+**Fórmula:** $W_R = \frac{\text{Oferta Total}}{\text{Demanda Total}}$ (Ecuación 7)
+
+**Interpretación:**
+- **> 3.0:** 🟢 Seguro (abundancia de agua)
+- **1.5 - 3.0:** 🟡 Estable (reserva moderada)
+- **1.0 - 1.5:** 🟠 Estrés moderado (límite de seguridad)
+- **< 1.0:** 🔴 Crisis hídrica (demanda supera oferta)
+
+**Ejemplo práctico:** Un ratio de 0.85 significa que el país demanda 15% más agua de la que tiene disponible → Necesitas importar agua virtual (en alimentos) o habrá escasez.
+
+#### 🌾 Ratio Alimentos Final
+**Qué muestra:** Seguridad alimentaria (autosuficiencia)
+
+**Fórmula:** $F_R = \frac{\text{Producción Total}}{\text{Demanda Total}}$ (Ecuación 20)
+
+**Interpretación:**
+- **> 1.2:** 🟢 Excedente (se puede exportar)
+- **1.0 - 1.2:** 🟡 Autosuficiente (balance justo)
+- **0.8 - 1.0:** 🟠 Déficit leve (importaciones necesarias)
+- **< 0.8:** 🔴 Hambruna (crisis alimentaria severa)
+
+**Ejemplo práctico:** Un ratio de 1.5 significa que produces 50% más comida de la que necesitas → México sería exportador neto de alimentos.
+
+**Nota Importante:** Este ratio incluye la demanda de granos para alimentar ganado (factor 3.5:1), por eso es más difícil de alcanzar que si solo contáramos consumo humano directo.
+
+#### ⚡ Ratio Energía Final
+**Qué muestra:** Balance energético
+
+**Fórmula:** $E_R = \frac{\text{Oferta Total}}{\text{Demanda Total}}$ (Ecuación 15)
+
+**Interpretación:**
+- **> 1.0:** 🟢 Superávit (se puede exportar)
+- **= 1.0:** 🟡 Balance perfecto
+- **< 1.0:** 🔴 Déficit (apagones, importaciones)
+
+**Ejemplo práctico:** Un ratio de 0.9 significa déficit del 10% → México tendría que importar electricidad o sufrir apagones.
+
+#### 🌍 Emisiones CO₂ Total
+**Qué muestra:** Emisiones acumuladas de dióxido de carbono durante toda la simulación
+
+**Fórmula:** Suma de emisiones año con año (Ecuación 23)
+
+**Interpretación:**
+- Menor es mejor para el clima
+- Incluye emisiones de carbón, petróleo y gas (sector energético)
+- Incluye 160 Mt/año de emisiones no energéticas (cemento, agricultura)
+
+**Ejemplo práctico:** 750 Mt acumuladas en 30 años = promedio de 25 Mt/año → Compara con la meta de París de reducir emisiones.
+
+---
+
+### 5. Panel de Resultados - Gráficas
+
+La interfaz muestra 4 gráficas que visualizan la evolución temporal de cada subsistema. Aquí explicamos **por qué están** y **qué significan**:
+
+#### 📊 Gráfica 1: Subsistema Agua
+**Por qué está:** El agua es un recurso finito y crítico. Esta gráfica te permite ver si México se está quedando sin agua y en qué año ocurrirá el punto crítico.
+
+**Qué muestra:**
+- **Línea azul (Demanda de Agua):** Agua total consumida por agricultura, industria, hogares y energía
+- **Línea celeste (Oferta de Agua):** Agua renovable disponible de ríos, acuíferos y desalinización
+
+**Cómo interpretar:**
+- Si las líneas **se cruzan**, ese es el año donde la demanda supera la oferta (crisis)
+- Si la **distancia entre líneas disminuye**, el estrés hídrico está aumentando
+- Si ves la **oferta caer** (línea celeste baja), significa que los acuíferos se están agotando
+
+**Ejemplo:** Si en 2030 las líneas se cruzan, significa que a partir de ese año México no tendrá suficiente agua natural y tendrá que:
+- Importar agua virtual (alimentos desde otros países)
+- Reducir consumo (racionamiento)
+- Invertir en desalinización (caro)
+
+#### 📊 Gráfica 2: Subsistema Alimentos
+**Por qué está:** Muestra la seguridad alimentaria del país. Si México no produce suficiente comida, depende de importaciones (vulnerabilidad).
+
+**Qué muestra:**
+- **Línea verde (Ratio Seguridad Alimentaria):** Producción / Demanda
+
+**Cómo interpretar:**
+- Línea **por encima de 1.0** = Autosuficiente o exportador
+- Línea **por debajo de 1.0** = Importador neto (peligro)
+- Si la línea **baja con el tiempo**, la situación alimentaria empeora
+
+**Ejemplo:** Si el ratio cae de 1.2 a 0.9 en 20 años, significa que México pasó de exportar 20% a tener que importar 10% de sus alimentos.
+
+#### 📊 Gráfica 3: Subsistema Energía
+**Por qué está:** La energía impulsa toda la economía. Esta gráfica muestra si el país puede cubrir su demanda eléctrica/combustible.
+
+**Qué muestra:**
+- **Línea naranja (Demanda de Energía):** Energía total requerida por industria, hogares, agricultura y bombeo de agua
+- **Línea amarilla (Oferta de Energía):** Energía total producida (renovables + fósiles)
+
+**Cómo interpretar:**
+- Si **demanda > oferta**, el país tiene apagones o debe importar energía
+- Si la **pendiente de demanda es muy alta**, la economía está creciendo rápido pero necesita más generación
+- Observa el "fossil gap": la brecha entre renovables y demanda que se llena con petróleo/gas
+
+**Ejemplo:** Si la demanda sube de 7,000 PJ a 15,000 PJ pero la oferta solo llega a 12,000 PJ, hay un déficit del 20% → Apagones o importar gas natural.
+
+#### 📊 Gráfica 4: Emisiones CO₂
+**Por qué está:** El cambio climático es consecuencia directa de quemar combustibles fósiles. Esta gráfica muestra la "factura ambiental" del crecimiento.
+
+**Qué muestra:**
+- **Línea morada (Emisiones CO₂):** Toneladas de dióxido de carbono emitidas cada año
+
+**Cómo interpretar:**
+- Si la línea **sube**, el país está contaminando más (alejándose de metas climáticas)
+- Si la línea **baja**, hay transición energética (más renovables, menos fósiles)
+- La **pendiente** indica qué tan rápido empeora o mejora la situación
+
+**Ejemplo:** Si las emisiones suben de 450 Mt/año a 900 Mt/año, México duplicó su contaminación → Incumplimiento del Acuerdo de París.
+
+**Relación con PIB:** Si el PIB crece sin invertir en renovables, el modelo automáticamente quema más petróleo/gas para cubrir la demanda energética, disparando el CO₂.
+
+---
+
+### 6. Flujo de Trabajo Recomendado
+
+**Paso 1:** Ejecuta el **Escenario Base** primero
+- Esto te da la línea de referencia (qué pasa si todo sigue igual)
+
+**Paso 2:** Haz clic en **"Agregar a Comparación"**
+- Guarda los resultados base para comparar después
+
+**Paso 3:** Cambia UNA variable a la vez
+- Ejemplo: Sube `Crecimiento PIB` de 2.5% a 4.0%
+- Ejecuta de nuevo
+
+**Paso 4:** Observa los cambios
+- ¿El ratio de agua bajó? ¿Las emisiones subieron?
+- Esto te dice el **efecto aislado** de esa variable
+
+**Paso 5:** Exporta los resultados
+- **CSV:** Para análisis en Excel/Python
+- **JSON:** Para procesamiento programático
+
+**Paso 6:** Experimenta con combinaciones
+- Prueba: ¿Qué pasa si subo PIB PERO también mejoro rendimiento agrícola?
+- Esto te ayuda a encontrar el "punto óptimo" de políticas
+
+---
+
+### 7. Consejos para Interpretar Resultados
+
+#### ⚠️ Advertencia: El Modelo NO es una predicción exacta
+Es una **herramienta de exploración de escenarios**. Los resultados te dicen:
+- "Si X crece y Y se mantiene, entonces Z pasará"
+- NO te dicen: "México en 2035 será exactamente así"
+
+#### 🔍 Busca Puntos Críticos
+- ¿En qué año el ratio de agua cae por debajo de 1.0?
+- ¿Cuándo las emisiones superan 1,000 Mt?
+- Estos son los "años de colapso" que debes evitar con políticas
+
+#### ⚖️ Balance de Trade-offs
+- No existe el escenario perfecto
+- Crecer económicamente (PIB alto) suele aumentar emisiones
+- Controlar población mejora todos los ratios, pero es políticamente difícil
+- Encuentra el balance que consideres aceptable
+
+#### 📈 Sensibilidad de Variables
+Las variables más sensibles (mayor impacto):
+1. **Crecimiento Poblacional:** Afecta TODO (agua, alimentos, energía)
+2. **Crecimiento PIB:** Dispara demanda energética e hídrica industrial
+3. **Rendimiento Agrícola:** Crucial para seguridad alimentaria
+4. **Años de Simulación:** Más años = más acumulación de problemas
 
 ---
 
