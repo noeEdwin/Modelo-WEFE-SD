@@ -24,11 +24,11 @@
     "ws_unconventional": 835.7,
     "wd_eco_req": 141658.0,
 
-    "energy_production_total": 7093.954,
-    "es_coal": 470.039,
-    "es_oil": 3414.267,
-    "es_gas": 2453.568,
-    "es_renewables": 756.082
+    "energy_production_total": 11511.889,
+    "es_coal": 470.137,
+    "es_oil": 7752.316,
+    "es_gas": 2532.210,
+    "es_renewables": 757.227
   },
 
   "params": {
@@ -50,9 +50,9 @@
     "energy_intensity_agri": 0.000002103,
     "straw_energy_factor": 0.000003,
 
-    "emission_factor_coal": 85000.0,
-    "emission_factor_oil": 74000.0,
-    "emission_factor_gas": 37000.0,
+    "emission_factor_coal": 50000.0,
+    "emission_factor_oil": 40000.0,
+    "emission_factor_gas": 40000.0,
     "pollutant_concentration_dom": 0.0463,
     "co2_non_energy": 100.0,
     "growth_co2_non_energy": 0.012,
@@ -64,8 +64,8 @@
     "growth_gdp": 0.01,
     "growth_urbanization": 0.0176,
     "growth_agri_yield": 0.022,
-    "growth_energy_supply": 0.0023,
-    "growth_energy_supply_post_2013": -0.0716,
+    "growth_energy_supply": -0.0172,
+    "growth_energy_supply_post_2013": -0.0486,
     "energy_transition_year": 2013
   }
 }

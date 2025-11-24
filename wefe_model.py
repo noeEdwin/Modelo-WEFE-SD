@@ -177,9 +177,9 @@ class WEFEModel:
         
         # Distribución de la oferta entre fuentes (manteniendo proporciones históricas)
         # Basado en los valores base del año 2005
-        base_coal = self.state.get('es_coal_base', self.state.get('es_coal', 470.039))
-        base_oil = self.state.get('es_oil_base', self.state.get('es_oil', 3414.267))
-        base_gas = self.state.get('es_gas_base', self.state.get('es_gas', 2453.568))
+        base_coal = self.state.get('es_coal_base', self.state.get('es_coal', 470.137))
+        base_oil = self.state.get('es_oil_base', self.state.get('es_oil', 7752.316))
+        base_gas = self.state.get('es_gas_base', self.state.get('es_gas', 2532.210))
         
         # Guardar valores base en el primer paso
         if 'es_coal_base' not in self.state:
@@ -194,10 +194,10 @@ class WEFEModel:
             ratio_oil = base_oil / total_fossil_base
             ratio_gas = base_gas / total_fossil_base
         else:
-            # Fallback basado en mix energético de México
-            ratio_coal = 0.066  # ~6.6%
-            ratio_oil = 0.481   # ~48.1%
-            ratio_gas = 0.346   # ~34.6%
+            # Fallback basado en mix energético de México (Actualizado 2005 Oferta Total)
+            ratio_coal = 0.0437  # ~4.4%
+            ratio_oil = 0.7208   # ~72.1%
+            ratio_gas = 0.2354   # ~23.5%
         
         # Oferta de fósiles = Producción total - Renovables
         fossil_supply = max(0, total_es - supply_renewables)

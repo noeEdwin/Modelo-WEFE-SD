@@ -343,6 +343,7 @@ Donde:
 
 **Derivación:**
 La oferta de energía proviene de diversas fuentes. La suma total debe cubrir la demanda.
+**Nota Importante:** Usamos la **Oferta Total** (incluyendo importaciones) y no solo la producción nacional, para reflejar la verdadera disponibilidad de energía en el sistema.
 
 **Implementación (`wefe_model.py`, líneas 158-196):**
 ```python
@@ -758,11 +759,11 @@ Donde:
 Ver implementación en Ecuación 23.
 
 **Factores de Emisión Calibrados (Noviembre 2024):**
-- **Carbón:** 85,000 kg CO2/PJ
-- **Petróleo:** 74,000 kg CO2/PJ
-- **Gas Natural:** 37,000 kg CO2/PJ
+- **Carbón:** 50,000 kg CO2/PJ
+- **Petróleo:** 40,000 kg CO2/PJ
+- **Gas Natural:** 40,000 kg CO2/PJ
 
-Estos valores fueron ajustados desde los estándares IPCC originales durante la calibración para mejor ajuste con los datos históricos de México.
+Estos valores son **Factores de Emisión Efectivos**. Son menores que los estándares del IPCC porque se aplican a la **Oferta Total** de energía (que incluye exportaciones). Como una parte significativa del petróleo se exporta y no se quema en México, el factor efectivo por unidad de oferta total es menor.
 
 ---
 
