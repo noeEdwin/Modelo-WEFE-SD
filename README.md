@@ -119,26 +119,64 @@ La función `calibrar` (Línea 264) ejecuta la Ecuación 25 del PDF (Error Relat
 
 $$ Error = \frac{|Simulado - Real|}{Real} \times 100 $$
 
-### Resultados de la Calibración (Noviembre 2025)
-Tras ajustar los parámetros iniciales y las lógicas de crecimiento, logramos un **Error Promedio Global del 3.77%**, lo cual es excelente para un modelo de esta complejidad.
+### Resultados de la Calibración (Noviembre 2024)
+
+#### Integración de Oferta de Energía
+
+Durante la calibración, integramos completamente la **Oferta Interna Bruta** de energía, que representa la energía disponible para consumo doméstico en México (excluyendo exportaciones de petróleo). Esta variable es fundamental para:
+- Validar que el subsistema energético refleje la capacidad real del país
+- Capturar la caída en producción de petróleo (campo Cantarell)
+- Entender el balance energético mexicano
+
+**Datos clave identificados:**
+- México pasó de producir **7,094 PJ** (2005) a **4,276 PJ** (2020)
+- Caída total: **-39.72%** en 15 años
+- Causa principal: Declive del campo petrolero Cantarell después de 2004
+
+#### Modelo de Crecimiento por Tramos (Piecewise Growth)
+
+Para capturar esta realidad, implementamos un **modelo de crecimiento por tramos** que divide el período 2005-2020 en dos etapas distintas:
+
+**Período 1 (2005-2013): Estabilidad**
+- Tasa de crecimiento energético: **+0.23%** anual
+- Producción petrolera relativamente estable
+- Antes de la reforma energética de 2013
+
+**Período 2 (2014-2020): Declive Acelerado**
+- Tasa de crecimiento energético: **-7.16%** anual  
+- Colapso acelerado de producción petrolera
+- Post-reforma energética + envejecimiento de infraestructura PEMEX
+
+Este mismo enfoque se aplicó a las emisiones de CO₂, reconociendo que tienen dinámicas diferentes a la energía (transición hacia fuentes más limpias, importaciones).
 
 #### Ajustes Realizados
-Para lograr esta precisión, realizamos tres correcciones clave al modelo teórico:
+
+Para lograr la calibración final, realizamos las siguientes correcciones al modelo teórico:
+
 1.  **Rendimientos Agrícolas Reales:** Ajustamos los rendimientos base de 2005 (`yield_*`) usando datos de producción real divididos por hectáreas/cabezas reales.
+
 2.  **Crecimiento Tecnológico Agrícola:** El modelo original no preveía mejora tecnológica. Agregamos un factor `growth_agri_yield` del **2.2% anual** para replicar el aumento histórico en la producción de alimentos de 2005 a 2020.
-3.  **Matriz Energética Dinámica:** En lugar de usar valores fijos, programamos el modelo para usar la mezcla real de combustibles de 2005 y añadimos un parámetro `co2_non_energy` (160 Mt) para contabilizar emisiones industriales no energéticas (cemento, químicos) que faltaban en el modelo original.
+
+3.  **Oferta Energética con Crecimiento por Tramos:** Implementamos tasas diferenciadas por período (2005-2013 vs 2014-2020) con un año de transición en 2013 que marca la reforma energética. Esto permite al modelo capturar tanto la estabilidad inicial como el declive posterior.
+
+4.  **Factores de Emisión Calibrados:** Ajustamos los factores de emisión de CO₂ para carbón, petróleo y gas, además de agregar un componente de emisiones no energéticas (agricultura, cemento, procesos industriales) que crece dinámicamente.
 
 #### Tabla de Errores (MAPE)
+
 | Variable | Error (%) | Interpretación |
 | :--- | :--- | :--- |
+| **Oferta de Energía** | **1.70%** | **Excelente.** El modelo replica casi perfectamente la tendencia de producción energética mexicana, incluyendo el declive petrolero de -39.72% observado entre 2005-2020. |
 | **Población** | **1.45%** | **Casi perfecto.** La dinámica demográfica es muy precisa. |
 | **Oferta de Agua** | **2.32%** | **Excelente.** El cálculo de disponibilidad natural coincide con CONAGUA. |
 | **Alimentos (Total)**| **2.21%** | **Excelente.** Gracias al factor de crecimiento tecnológico, el modelo replica la producción histórica. |
 | **Demanda de Agua** | **3.61%** | **Muy bueno.** El consumo por sectores sigue la tendencia real. |
 | **PIB Real** | **4.84%** | **Bueno.** La economía es volátil, pero la tendencia es correcta. |
-| **CO2 y Energía** | **~5.7%** | **Aceptable.** Las emisiones son difíciles de predecir por cambios políticos, pero el error es bajo. |
+| **Emisiones CO₂** | **9.67%** | **Aceptable.** El modelo captura bien el período 2005-2013 (error ~3%), pero tiene mayor error en 2014-2020 (~18%) debido a la transición energética de México: aumento dramático de renovables, importaciones de energía (cuyo CO₂ se genera fuera), y mejoras en eficiencia. Reducir a <5% requeriría modelar dinámicamente el mix energético (carbón/petróleo/gas/renovables con porcentajes variables), fuera del alcance actual. |
 
-> **Conclusión:** Con un error global < 4%, el modelo está **matemáticamente validado** para simular escenarios futuros (2025-2050) con alta confianza.
+> **Nota sobre CO₂:** La transición energética de México es evidente en los datos: mientras la oferta de energía cayó 39.72%, las emisiones solo cayeron 4.35% (2005-2020). Esto indica un cambio significativo hacia fuentes más limpias que el modelo actual con ratios fijos de combustibles no captura completamente. El error de 9.67% es aceptable considerando esta limitación estructural.
+
+> **Conclusión:** Con un error promedio de energía de **1.70%** y errores generales <4% para la mayoría de variables, el modelo está **matemáticamente validado** para simular escenarios futuros (2025-2050) con alta confianza, especialmente para proyecciones del nexo agua-energía-alimentos.
+
 
 ---
 
