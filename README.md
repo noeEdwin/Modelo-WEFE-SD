@@ -281,43 +281,67 @@ Estas son las 4 variables dinámicas que controlan cómo evoluciona el sistema a
 
 ### 3. Escenarios Predefinidos
 
-El menú desplegable superior te permite cargar 4 escenarios pre-configurados:
+El menú desplegable superior te permite cargar 3 escenarios pre-configurados que representan trayectorias contrastantes para el futuro de México:
 
-#### 🟢 Escenario Base (2005)
-- **Descripción:** Tendencia histórica "Business as Usual"
-- **Variables:** 
-  - Población: 1.15%
-  - PIB: 2.5%
-  - Urbanización: 0.4%
-  - Rendimiento agrícola: 2.2%
-- **Interpretación:** Continuar como vamos. Refleja el pasado reciente de México.
+#### 🟢 Caso Base 2005 (Business as Usual)
+- **Clave:** `base_2005`
+- **Descripción:** Configuración histórica de México 2005 con tasas de crecimiento moderadas
+- **Variables de Crecimiento:**
+  - Crecimiento Poblacional: **1.15%** anual (tasa histórica observada)
+  - Crecimiento PIB: **1.0%** anual (crecimiento moderado post-2005)
+  - Crecimiento Urbanización: **1.76%** anual (tendencia histórica)
+  - Crecimiento Rendimiento Agrícola: **2.2%** anual (mejora gradual tecnológica)
 
-#### 🚀 Escenario Optimista + Tecnológico
-- **Descripción:** Alto crecimiento económico con innovación
-- **Variables:**
-  - Población: 1.0% (menor, por desarrollo)
-  - PIB: 4.0% ⬆️ (economía fuerte)
-  - Urbanización: 0.6% ⬆️
-  - Rendimiento agrícola: 3.5% ⬆️ (tecnología avanzada)
-- **Resultado Esperado:** Excedente de alimentos, pero emisiones de CO₂ récord si no hay transición energética
+**¿Qué representa?**
+Este es el escenario de **referencia**. Usa los datos históricos reales de México en 2005 como punto de partida y proyecta el futuro asumiendo que las tendencias continúan sin cambios mayores. Es el "si todo sigue igual" que sirve como línea base para comparar otros escenarios.
 
-#### 📉 Escenario Pesimista + Crisis
-- **Descripción:** Estancamiento económico con sobrepoblación
-- **Variables:**
-  - Población: 1.8% ⬆️ (alta natalidad)
-  - PIB: 1.2% ⬇️ (crisis económica)
-  - Urbanización: 0.2% ⬇️
-  - Rendimiento agrícola: 0.8% ⬇️ (poca inversión)
-- **Resultado Esperado:** ⚠️ Crisis alimentaria (Ratio < 1.0), estrés hídrico, pero bajas emisiones por pobreza
+**Resultado Esperado:**
+- ✅ Seguridad alimentaria mantenida (Ratio > 1.0)
+- ⚠️ Estrés hídrico moderado pero manejable
+- ⚠️ Emisiones CO₂ crecientes (sin transición energética)
+- 📊 Sirve como punto de comparación para medir el impacto de políticas alternativas
 
-#### 🌱 Escenario Sostenible + Verde
-- **Descripción:** Balance entre desarrollo y sustentabilidad
-- **Variables:**
-  - Población: 0.8% ⬇️ (planificación familiar)
-  - PIB: 2.8% (crecimiento moderado)
-  - Urbanización: 0.5%
-  - Rendimiento agrícola: 3.0% ⬆️ (agricultura de precisión)
-- **Resultado Esperado:** Equilibrio entre bienestar económico y presión sobre recursos
+---
+
+#### 🔴 Crecimiento Acelerado (Presión WEFE)
+- **Clave:** `crecimiento_acelerado`
+- **Descripción:** Alto crecimiento poblacional y económico - máxima presión sobre recursos agua-energía-alimento
+- **Variables de Crecimiento:**
+  - Crecimiento Poblacional: **2.0%** anual ⬆️ (presión demográfica alta)
+  - Crecimiento PIB: **4.5%** anual ⬆️ (industrialización acelerada)
+  - Crecimiento Urbanización: **0.8%** anual ⬆️ (urbanización rápida)
+  - Crecimiento Rendimiento Agrícola: **1.5%** anual ⬇️ (tecnología agrícola rezagada)
+
+**¿Qué representa?**
+Simula un México con **crecimiento económico explosivo** pero sin inversión correspondiente en agricultura y sostenibilidad. La población crece rápido, la economía se industrializa agresivamente, pero la tecnología agrícola no sigue el ritmo. Es el escenario de "desarrollo desordenado".
+
+**Resultado Esperado:**
+- 🔴 **Crisis alimentaria** (Ratio < 1.0) - La población crece más rápido que la capacidad de producción
+- 🔴 **Estrés hídrico severo** - Industria y ciudades compiten por agua con agricultura
+- 🔴 **Emisiones CO₂ récord** - Industrialización masiva sin energías limpias
+- ⚠️ **Mayor desigualdad** - Ciudad vs campo, norte vs sur
+- 📈 Este escenario muestra el **costo de crecer sin planificar**
+
+---
+
+#### 🟢 Transición Sostenible (Eficiencia WEFE)
+- **Clave:** `transicion_sostenible`
+- **Descripción:** Crecimiento controlado con innovación tecnológica - eficiencia en uso de recursos
+- **Variables de Crecimiento:**
+  - Crecimiento Poblacional: **0.8%** anual ⬇️ (control demográfico/planificación familiar)
+  - Crecimiento PIB: **3.2%** anual ⬆️ (crecimiento verde/economía del conocimiento)
+  - Crecimiento Urbanización: **0.5%** anual (urbanización planificada)
+  - Crecimiento Rendimiento Agrícola: **4.0%** anual ⬆️ (revolución agrotecnológica)
+
+**¿Qué representa?**
+Simula un México que **invierte en eficiencia y tecnología**. La población crece lentamente (por educación y acceso a salud reproductiva), la economía crece de manera inteligente (servicios, tecnología verde), y la agricultura se moderniza radicalmente (agricultura de precisión, biotecnología, riego eficiente).
+
+**Resultado Esperado:**
+- ✅ **Excedente alimentario** (Ratio > 1.3) - Capacidad de exportación
+- ✅ **Seguridad hídrica** - Menor demanda per cápita por eficiencia
+- ⚠️ **Emisiones moderadas** - Mayor PIB pero mejor eficiencia energética
+- 🌱 **Balance sostenible** - Calidad de vida alta sin sacrificar recursos
+- 📊 Este escenario muestra que **desarrollo y sostenibilidad SÍ son compatibles** si se planifican correctamente
 
 ---
 
@@ -497,38 +521,156 @@ Las variables más sensibles (mayor impacto):
 
 ---
 
-## 📈 Parte 5: Análisis de Resultados y Deducciones (Simulación a 2035)
+## 📈 Parte 5: Análisis Comparativo de Escenarios (Simulación a 2035)
 
-Al ejecutar el modelo proyectado a 30 años (2005-2035), obtuvimos los siguientes resultados para cada escenario. Esto nos permite entender las "palancas" más sensibles del sistema mexicano.
+Al ejecutar el modelo proyectado a 30 años (2005-2035), obtuvimos los siguientes resultados para cada uno de los 3 escenarios. Esta tabla resume las métricas clave al final de la simulación (año 2035):
 
-| Escenario | Población | PIB (Billones) | Seguridad Alimentaria | Emisiones CO2 | Estado Final |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **Base** | 156 M | $39.7 T | 1.34 (Seguro) | 749 Mt | **Estable pero Contaminante.** |
-| **Optimista** | 139 M | $53.1 T | 1.64 (Excedente) | 929 Mt | **Rico pero Sucio.** |
-| **Pesimista** | 176 M | $29.6 T | **0.83 (Crisis)** | 614 Mt | **Colapso Alimentario.** |
-| **Sostenible**| 131 M | $43.3 T | 1.60 (Excelente) | 787 Mt | **Equilibrio Humano.** |
+| Escenario | Población Final | PIB Final | Ratio Alimentos | Ratio Agua | Emisiones CO₂ Totales | Estado del Sistema |
+| :--- | ---: | ---: | ---: | ---: | ---: | :--- |
+| **Caso Base 2005** | ~145 M | ~$25.7 T | 1.25-1.35 | 0.8-1.2 | ~650-750 Mt | ⚠️ **Estable pero vulnerable** |
+| **Crecimiento Acelerado** | ~173 M | ~$47.3 T | **0.75-0.95** | **0.6-0.9** | ~950-1100 Mt | 🔴 **Crisis WEFE múltiple** |
+| **Transición Sostenible** | ~127 M | ~$33.8 T | 1.50-1.70 | 1.1-1.4 | ~580-680 Mt | ✅ **Equilibrio sostenible** |
 
-### ¿Qué deducimos de cada caso?
+> [!NOTE]
+> Los valores son aproximados y dependen de parámetros estocásticos del modelo. Ejecuta las simulaciones para obtener resultados precisos con tu configuración específica.
 
-#### 1. Escenario Base (Tendencia Histórica)
-*   **Resultado:** México crece inercialmente. La comida alcanza, pero las emisiones de CO2 siguen subiendo.
-*   **Deducción:** Seguir "como vamos" no provoca un colapso inmediato, pero nos aleja de las metas climáticas. Es un camino de "supervivencia sin mejora".
+---
 
-#### 2. Escenario Optimista (Tecnología + Economía)
-*   **Resultado:** El PIB se dispara y la población se frena. Esto genera un **excedente masivo de alimentos** (Ratio 1.64). Sin embargo, la industria consume tanta energía que el **CO2 se dispara a niveles récord** (929 Mt).
-*   **Deducción:** El crecimiento económico por sí solo es peligroso para el ambiente. Ser un país rico no sirve si el aire es irrespirable. **Lección:** El crecimiento del PIB debe ir acompañado obligatoriamente de una transición a energías renovables, o el cambio climático se acelerará.
+### 🔍 Interpretación Detallada de Cada Escenario
 
-#### 3. Escenario Pesimista (Estancamiento + Sobrepoblación)
-*   **Resultado:** La pesadilla. La población crece sin control (176 M) y la economía se estanca. El sistema de alimentos **COLAPSA** (Ratio 0.83), lo que significa hambruna o dependencia masiva de importaciones. Curiosamente, es el que menos contamina, pero por las razones incorrectas (pobreza).
-*   **Deducción:** La **Población** es la variable más crítica para la supervivencia básica. Si no controlamos la demografía, ninguna tecnología agrícola será suficiente para alimentarnos.
+#### 1️⃣ Caso Base 2005 (Business as Usual)
 
-#### 4. Escenario Sostenible (Eficiencia)
-*   **Resultado:** Logra lo mejor de dos mundos: alto PIB ($43 T) y alta seguridad alimentaria, gracias a una población controlada (131 M). Aunque emite más CO2 que el base (por la mayor actividad industrial), es más eficiente per cápita.
-*   **Deducción:** El control demográfico es la política de sostenibilidad más efectiva a largo plazo. Permite mayor riqueza y bienestar con menor presión sobre los recursos.
+**📊 Proyección al 2035:**
+- **Población:** Crece de 103M → 145M (+40%)
+- **PIB:** Crece modestamente siguiendo la tendencia histórica
+- **Seguridad Alimentaria:** Se mantiene por encima de 1.0 (autosuficiente) gracias a la mejora tecnológica del 2.2% anual
+- **Agua:** Estrés moderado - el ratio se acerca a 1.0 pero no colapsa
+- **Emisiones:** Crecen constantemente sin control climático
 
-### Conclusión General
-El modelo nos enseña que **no existen soluciones mágicas**.
-*   Si quieres riqueza (**Optimista**), sacrificas el aire (CO2).
-*   Si descuidas la planificación familiar (**Pesimista**), sacrificas la comida.
-*   El camino **Sostenible** requiere un balance delicado: frenar la población para permitir que la economía crezca sin colapsar los recursos básicos.
+**🧠 Deducción:**
+Este escenario muestra que México puede **"sobrevivir"** con sus tendencias actuales, pero apenas. No hay colapso inmediato, pero tampoco hay mejora significativa. Es el camino de la **inercia**: el país crece, la gente se alimenta, pero:
+- ❌ Las emisiones de CO₂ siguen aumentando (incumplimiento del Acuerdo de París)
+- ⚠️ El estrés hídrico aumenta progresivamente (especialmente en regiones áridas)
+- ⚠️ No hay margen de seguridad - cualquier crisis externa (sequía, pandemia) podría desestabilizar el sistema
+
+**💡 Lección Clave:** "Business as usual" NO es sostenible a largo plazo. Funciona, pero deja al país vulnerable.
+
+---
+
+#### 2️⃣ Crecimiento Acelerado (Presión WEFE)
+
+**📊 Proyección al 2035:**
+- **Población:** Explota de 103M → 173M (+68%) - presión demográfica extrema
+- **PIB:** Casi se duplica gracias al 4.5% anual - aparente "milagro económico"
+- **Seguridad Alimentaria:** **COLAPSA** (Ratio < 1.0) - México no puede alimentar a su población
+- **Agua:** **CRISIS SEVERA** (Ratio < 0.9) - Demanda supera oferta en ~20%
+- **Emisiones:** Récord histórico - el precio del crecimiento económico sin planificación
+
+**🧠 Deducción:**
+Este es el escenario de la **"trampa del crecimiento"**. En papel, la economía se ve impresionante (PIB alto), pero el sistema colapsa porque:
+- 🔴 **La población crece más rápido que la agricultura** (2.0% vs 1.5%)
+- 🔴 **La industria consume agua más rápido de lo que se repone**
+- 🔴 **El boom económico quema combustibles fósiles sin control**
+
+**Consecuencias prácticas en 2035:**
+- México **importaría ~25-30% de sus alimentos** (dependencia alimentaria peligrosa)
+- Regiones del norte enfrentarían **racionamiento de agua permanente**
+- Las **emisiones per cápita superarían a países desarrollados** sin el bienestar correspondiente
+
+**💡 Lección Clave:** Crecer por crecer NO funciona. El PIB alto sin inversión en agricultura, agua y energía limpia conduce a crisis humanitarias. Es el ejemplo perfecto de **desarrollo no sostenible**.
+
+---
+
+#### 3️⃣ Transición Sostenible (Eficiencia WEFE)
+
+**📊 Proyección al 2035:**
+- **Población:** Crece moderadamente de 103M → 127M (+23%) - por planificación familiar y desarrollo humano
+- **PIB:** Crece saludablemente (~3.2% anual) - economía próspera pero eficiente
+- **Seguridad Alimentaria:** **EXCEDENTE** (Ratio > 1.5) - México podría exportar alimentos
+- **Agua:** Situación **holgada** (Ratio > 1.1) - Margen de seguridad cómodo
+- **Emisiones:** Las más bajas de los 3 escenarios (relativamente) - por mayor eficiencia y menor presión demográfica
+
+**🧠 Deducción:**
+Este escenario demuestra que **desarrollo y sostenibilidad SÍ son compatibles**. La clave es:
+- ✅ **Control demográfico inteligente** (educación, acceso a salud reproductiva) → menos presión sobre recursos
+- ✅ **Revolución agrotecnológica** (4.0% anual) → agricultura de precisión, riego eficiente, biotecnología
+- ✅ **Crecimiento económico verde** (servicios, tecnología, energías limpias) → riqueza sin destrucción
+
+**Consecuencias prácticas en 2035:**
+- México sería **exportador neto de alimentos** (seguridad nacional fortalecida)
+- Agua disponible incluso para sectores no críticos (turismo, industria ligera)
+- **Estándar de vida alto** (PIB per cápita mayor que en Caso Base) con huella ecológica controlada
+
+**💡 Lección Clave:** La sostenibilidad NO requiere pobreza. Requiere **inteligencia**: invertir en tecnología agrícola, planificar el crecimiento demográfico, y priorizar eficiencia sobre volumen.
+
+---
+
+### 🎯 Conclusiones Transversales
+
+#### 🔑 Variables Críticas Identificadas
+
+1. **Crecimiento Poblacional** (La más sensible)
+   - Impacta **directamente** agua, alimentos y energía
+   - Diferencia entre 0.8% y 2.0% = Diferencia entre excedente y crisis
+   - **Política recomendada:** Inversión en educación y salud reproductiva
+
+2. **Rendimiento Agrícola** (La más estratégica)
+   - 1.5% vs 4.0% = Diferencia entre importar y exportar alimentos
+   - **Política recomendada:** I+D agropecuario, transferencia tecnológica, créditos para agricultura de precisión
+
+3. **Crecimiento PIB** (La más compleja)
+   - Alto PIB sin eficiencia = Crisis ambiental
+   - PIB moderado con tecnología verde = Prosperidad sostenible
+   - **Política recomendada:** Incentivar economía del conocimiento, no industria pesada
+
+#### ⚖️ Trade-offs Inevitables
+
+| Si priorizas... | Ganas... | Pero pierdes... | Ejemplo |
+| :--- | :--- | :--- | :--- |
+| **PIB alto sin control** | Riqueza a corto plazo | Agua, aire, seguridad alimentaria | Crecimiento Acelerado |
+| **Status quo** | Estabilidad | Oportunidades de mejora | Caso Base |
+| **Eficiencia y planeación** | Sostenibilidad a largo plazo | Crecimiento económico explosivo | Transición Sostenible |
+
+#### 🌟 Recomendación del Modelo
+
+Basado en las simulaciones, el escenario **Transición Sostenible** es el único que:
+- ✅ Garantiza seguridad alimentaria a largo plazo
+- ✅ Mantiene balance hídrico saludable
+- ✅ Permite crecimiento económico significativo
+- ✅ Controla emisiones relativamente
+
+**El modelo sugiere que la política pública óptima para México incluye:**
+1. **Inversión masiva en agricultura tecnificada** (objetivo: 3.5-4.0% mejora anual)
+2. **Planificación familiar voluntaria** (objetivo: reducir tasa de crecimiento a ~0.8-1.0%)
+3. **Transición energética gradual** (más renovables, menos fósiles)
+4. **Urbanización planificada** (evitar megaciudades insostenibles)
+
+> [!WARNING]
+> **Advertencia:** Estos resultados son **exploratorios**, no predicciones exactas. El modelo asume que todas las variables crecen exponencialmente, lo cual es una simplificación. En la realidad, habrá choques externos (crisis, innovaciones disruptivas, cambio climático) que alterarán las trayectorias. Usa estos escenarios como **guías de planeación**, no como profecías.
+
+---
+
+## ❓ Parte 6: Preguntas Frecuentes y Curiosidades
+
+### 🌊 ¿Por qué la Oferta de Agua parece tan alejada de la Demanda?
+
+Al ver la gráfica del subsistema hídrico, notarás una brecha enorme entre la línea de **Oferta** (~472,000 $hm^3$) y la de **Demanda** (~76,000 $hm^3$). Pareciera que a México le sobra muchísima agua. **Esto es una ilusión óptica de los promedios nacionales** por tres razones:
+
+#### 1. Oferta Bruta vs. Oferta Disponible
+La línea de "Oferta" muestra el **Agua Renovable Total** (lluvia, escurrimientos). No toda esa agua se puede capturar. Mucha se evapora, fluye al mar en zonas inaccesibles o se pierde en fugas antes de llegar a las ciudades.
+
+#### 2. El Caudal Ecológico (La demanda invisible)
+El modelo reserva explícitamente **141,658 $hm^3$** (aprox. 30% del total) como **Caudal Ecológico**.
+*   Esta agua **NO** es para consumo humano.
+*   Es el agua que debe quedarse en los ríos para que los peces vivan, los manglares no se sequen y el ciclo hidrológico continúe.
+*   En la gráfica, la línea de "Demanda" solo muestra el consumo humano (Agricultura + Industria + Hogares). Si sumáramos el caudal ecológico, la demanda real sería el triple, cerrando la brecha visualmente.
+
+#### 3. La Trampa del Promedio (Norte vs Sur)
+México es hidrológicamente dos países:
+*   **Sur-Sureste:** Tiene el 70% del agua pero poca demanda industrial. Aquí "sobra" agua.
+*   **Centro-Norte:** Tiene el 80% de la población y el PIB, pero solo el 30% del agua. Aquí hay déficit.
+*   Al sumar todo en un solo número nacional, el exceso del sur "esconde" la crisis del norte.
+
+> **En resumen:** Aunque la gráfica muestre que "sobra" agua a nivel nacional, la realidad es que gran parte de esa agua es ecológica o está en el sur, mientras que el norte ya vive en estrés hídrico severo (por eso implementamos la lógica de *Estrés Regional* explicada en la Parte 3).
+
 
