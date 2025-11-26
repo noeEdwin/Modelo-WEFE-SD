@@ -164,28 +164,47 @@ wd_energy = s['energy_production_total'] * p['quota_water_energy']
 
 ### Ecuación 6: Oferta Total de Agua
 
+### Ecuación 6: Oferta Hídrica Efectiva (WS_ef)
+
 **Ecuación:**
-$$WS = WS_{sup} + WS_{sub} + WS_{un}$$
+$$WS_{ef} = (WS_{sup} + WS_{sub} + WS_{un}) \times k_{WS}$$
 
 Donde:
-- $WS$ = Oferta total (disponibilidad natural) (hm³)
-- $WS_{sup}$ = Agua superficial (ríos, lagos) (hm³)
-- $WS_{sub}$ = Agua subterránea (acuíferos) (hm³)
-- $WS_{un}$ = Agua no convencional (desalinización, reúso) (hm³)
+- $WS_{ef}$ = Oferta Hídrica Efectiva (hm³) - Agua realmente utilizable
+- $WS_{sup}$ = Agua superficial (ríos, lagos)
+- $WS_{sub}$ = Agua subterránea (acuíferos)
+- $WS_{un}$ = Agua no convencional
+- $k_{WS}$ = Factor de Disponibilidad Efectiva ($\approx 0.429$)
 
-**Derivación:**
-La oferta de agua proviene de múltiples fuentes. La suma nos da la disponibilidad total que el país puede usar.
+**Derivación (La "Ilusión de Abundancia"):**
+México tiene una oferta natural total de ~472,000 hm³. Sin embargo, usar este número en el modelo es erróneo porque asume que el agua del sur (abundante) puede satisfacer la demanda del norte (árido).
 
-**Implementación (`wefe_model.py`, línea 119):**
+Para corregir esto, calculamos el **Factor de Oferta Efectiva ($k_{WS}$)** usando datos regionales (RHA) de la CONAGUA (EAM 2005):
+
+1. **Regiones con Estrés (Grado de Presión > 40%):** Asumimos que **ya no hay agua disponible**. Su oferta efectiva es igual a su uso actual ($VC$).
+   - Aporte: 38,272 hm³ (Norte y Centro)
+2. **Regiones con Holgura (Grado de Presión < 40%):** Limitamos su uso al **40%** de su agua renovable para proteger el caudal ecológico.
+   - Aporte: 164,490 hm³ (Sur y Costas)
+
+$$ WS_{ef,total} = 38,272 + 164,490 = 202,762 \text{ hm}^3 $$
+
+El factor de corrección es la relación entre la realidad y la oferta bruta:
+$$ k_{WS} = \frac{202,762}{472,194} \approx \mathbf{0.429} $$
+
+**Implementación (`wefe_model.py`, líneas 119-122):**
 ```python
+# Oferta Bruta (Total Natural)
 total_ws_natural = s['ws_surface'] + s['ws_ground'] + s['ws_unconventional']
+
+# Aplicamos el Factor de Realidad (0.429)
+factor_oferta_efectiva = 0.429
+ws_effective = total_ws_natural * factor_oferta_efectiva
 ```
 
 **Ejemplo Numérico (2005):**
-- Superficial: 395,210 hm³
-- Subterránea: 76,984 hm³
-- No convencional: 835.7 hm³
-- **Total:** 473,030 hm³
+- Oferta Bruta (Lluvia total): 473,030 hm³
+- **Oferta Efectiva (Modelo):** $473,030 \times 0.429 = \mathbf{202,929 \text{ hm}^3}$
+- Esto reduce el Ratio Hídrico de un irreal ~6.0 a un realista ~2.6.
 
 ---
 

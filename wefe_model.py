@@ -115,20 +115,30 @@ class WEFEModel:
         wd_total = wd_human + wd_eco
 
         # --- OFERTA DISPONIBLE (WS) (Eq 6) ---
-        # Oferta Total Natural (Bruta)
+        # Oferta Total Natural (Bruta) - Lo que llueve
         total_ws_natural = s['ws_surface'] + s['ws_ground'] + s['ws_unconventional']
         
+        # --- OFERTA HÍDRICA EFECTIVA (WS_ef) ---
+        # Aplicamos el "Factor de Realidad" calculado con datos de la EAM 2005 (Tabla 3.4).
+        # Factor = 0.429 (43%)
+        # Representa el agua que realmente se puede usar sin secar ríos en el sur 
+        # ni inventar agua en el norte.
+        factor_oferta_efectiva = 0.429
+        
+        ws_effective = total_ws_natural * factor_oferta_efectiva
+        
         # --- BALANCE (Wr) (Eq 7) ---
-        # Ratio = Oferta Total / Demanda Total
-        # Nota: Al incluir wd_eco en la demanda, usamos la oferta bruta para el ratio.
-        w_r = total_ws_natural / wd_total if wd_total > 0 else 0
+        # Ratio = Oferta Efectiva / Demanda Total
+        # Usamos la oferta ajustada para que el indicador de estrés sea realista.
+        w_r = ws_effective / wd_total if wd_total > 0 else 0
         
         return {
-            'water_demand': wd_human,     # Reportamos solo humana para coincidir con gráfica SQL (76k)
-            'water_supply': total_ws_natural, # Reportamos oferta bruta para coincidir con SQL (472k)
+            'water_demand': wd_human,     
+            'water_supply': ws_effective, # Reportamos la efectiva (la realista)
             'water_ratio': w_r,
             'wd_eco': wd_eco,
-            'wd_total_system': wd_total   # Guardamos el total real por si acaso
+            'wd_total_system': wd_total,
+            'ws_potential_climate': total_ws_natural # Guardamos el dato bruto por si se necesita
         }
 
     def _step_energy(self, water_metrics, food_metrics):

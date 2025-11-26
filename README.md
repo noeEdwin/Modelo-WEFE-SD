@@ -56,10 +56,15 @@ Convierte el consumo de combustibles en emisiones de CO2 usando factores del IPC
 
 Aunque nos basamos en el modelo de *Ling et al. (2024)*, hemos realizado adaptaciones críticas para que el modelo funcione realistamente en el contexto de México. Aquí explicamos qué cambiamos y por qué.
 
-### 1. Estrés Hídrico Regional (Corrección del "Aggregation Bias")
-*   **El Problema:** En el modelo original, si el país en promedio tiene agua (Ratio < 1.0), se asume que todo está bien. En México, el sur tiene mucha agua y el norte muy poca. Un promedio nacional esconde la crisis del norte.
-*   **Nuestra Solución:** Implementamos una lógica de **degradación de acuíferos**. Si el estrés hídrico nacional (`water_ratio`) es "saludable" pero menor a 3.0 (un umbral de seguridad), asumimos que existen regiones críticas que ya están sobreexplotando sus reservas.
-*   **En el código:** Reducimos la reserva de agua subterránea (`ws_ground`) un **0.5% anual** cuando el ratio es < 3.0. Esto simula el agotamiento progresivo de los acuíferos en zonas áridas, incluso si el "promedio" nacional parece seguro.
+### 1. Oferta Hídrica Efectiva (Corrección de la "Ilusión de Abundancia")
+*   **El Problema:** Si sumas toda el agua de México (472,000 hm³), parece que sobra muchísima (Ratio > 5). Pero esto es falso: el 70% del agua está en el sur (donde vive poca gente) y el norte está seco. El modelo original asumía que podíamos usar el agua de Chiapas para regar Sonora, lo cual es imposible.
+*   **Nuestra Solución:** Implementamos el concepto de **Oferta Hídrica Efectiva ($WS_{ef}$)**.
+    *   En regiones con estrés (Grado de Presión > 40%), la oferta se limita a lo que ya usan hoy (no hay agua nueva).
+    *   En regiones con agua (Sur), limitamos el uso al **40%** de su capacidad para proteger el caudal ecológico.
+*   **Resultado:** La oferta nacional utilizable baja de 472,000 hm³ a **~202,000 hm³**.
+*   **Factor de Realidad ($k_{WS}$):** Calculamos que solo el **42.9%** del agua de lluvia es realmente aprovechable.
+    $$ WS_{ef} = WS_{total} \times 0.429 $$
+*   **Impacto:** El modelo ahora muestra estrés hídrico realista (Ratio ~2.5) en lugar de una abundancia ficticia.
 
 ### 3. Demanda de Granos para Ganado (Feed)
 *   **El Problema:** Ignorar lo que comen las vacas subestima masivamente la demanda agrícola.
