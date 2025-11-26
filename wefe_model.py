@@ -104,8 +104,21 @@ class WEFEModel:
         # Eq 5: Energía
         wd_energy = s['energy_production_total'] * p['quota_water_energy']
         
-        # Total Demanda Humana (Consuntiva)
-        wd_human = (wd_agri + wd_ind + wd_dom + wd_energy) / 1000000.0
+        # --- AJUSTE POR USO NO REGISTRADO ---
+        # Los datos de demanda son de volumen concesionado (oficial).
+        # Aplicamos factores para reflejar el uso real (incluye pozos clandestinos, extracción ilegal, etc.)
+        factor_unregistered_agri = p.get('factor_unregistered_agri', 1.50)    # +50%
+        factor_unregistered_ind = p.get('factor_unregistered_ind', 1.20)      # +20%
+        factor_unregistered_dom = p.get('factor_unregistered_dom', 1.30)      # +30%
+        factor_unregistered_energy = p.get('factor_unregistered_energy', 1.10) # +10%
+        
+        wd_agri_real = wd_agri * factor_unregistered_agri
+        wd_ind_real = wd_ind * factor_unregistered_ind
+        wd_dom_real = wd_dom * factor_unregistered_dom
+        wd_energy_real = wd_energy * factor_unregistered_energy
+        
+        # Total Demanda Humana (Consuntiva) - Ajustada por uso no registrado
+        wd_human = (wd_agri_real + wd_ind_real + wd_dom_real + wd_energy_real) / 1000000.0
         
         # --- REQUERIMIENTO ECOLÓGICO (Eq 1) ---
         # El paper (Ling et al., 2024) suma la demanda ecológica a la demanda total.

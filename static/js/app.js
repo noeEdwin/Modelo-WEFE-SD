@@ -314,6 +314,8 @@ function updateChart(canvasId, chartKey, data) {
                     }
                 },
                 y: {
+                    beginAtZero: chartKey === 'water', // Inicio en 0 solo para gráfica de agua
+                    max: chartKey === 'water' ? 400000 : undefined, // Máximo en 400,000 para agua
                     grid: {
                         color: '#f3f4f6'
                     },

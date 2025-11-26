@@ -44,6 +44,11 @@
     "quota_water_dom": 103.65,
     "quota_water_energy": 594952.0,
 
+    "factor_unregistered_agri": 2.0,
+    "factor_unregistered_ind": 1.5,
+    "factor_unregistered_dom": 1.8,
+    "factor_unregistered_energy": 1.4,
+
     "intensity_energy_ind": 0.0000000001900,
     "intensity_energy_dom": 0.0000068000,
     "energy_per_m3_water": 0.00000000342,
