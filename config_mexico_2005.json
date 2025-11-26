@@ -44,17 +44,17 @@
     "quota_water_dom": 103.65,
     "quota_water_energy": 594952.0,
 
-    "intensity_energy_ind": 0.0000000002003,
-    "intensity_energy_dom": 0.0000070812,
+    "intensity_energy_ind": 0.0000000001900,
+    "intensity_energy_dom": 0.0000068000,
     "energy_per_m3_water": 0.00000000342,
     "energy_intensity_agri": 0.000002103,
     "straw_energy_factor": 0.000003,
 
-    "emission_factor_coal": 50000.0,
-    "emission_factor_oil": 40000.0,
-    "emission_factor_gas": 40000.0,
+    "emission_factor_coal": 94600.0,
+    "emission_factor_oil": 73300.0,
+    "emission_factor_gas": 56100.0,
     "pollutant_concentration_dom": 0.0463,
-    "co2_non_energy": 100.0,
+    "co2_non_energy": 200.0,
     "growth_co2_non_energy": 0.012,
     "growth_co2_non_energy_post_2013": 0.015
   },
@@ -66,6 +66,7 @@
     "growth_agri_yield": 0.022,
     "growth_energy_supply": -0.0172,
     "growth_energy_supply_post_2013": -0.0486,
-    "energy_transition_year": 2013
+    "energy_transition_year": 2013,
+    "growth_energy_efficiency": 0.005
   }
 }

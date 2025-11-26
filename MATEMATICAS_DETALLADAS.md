@@ -725,44 +725,44 @@ Ver implementación en Ecuación 21.
 
 ---
 
-### Ecuación 23: Emisiones Totales de CO2
-
-**Ecuación:**
-$$CO_2 = CO_{2,coal} + CO_{2,oil} + CO_{2,gas} + CO_{2,non-energy}$$
-
-Donde:
-- $CO_2$ = Emisiones totales de CO2 (Megatoneladas)
-- $CO_{2,i}$ = Emisiones del combustible $i$
-- $CO_{2,non-energy}$ = Emisiones no energéticas (industria, agricultura)
-
-**Implementación (`wefe_model.py`, líneas 223-232):**
-```python
-# Emisiones por combustible
-co2_coal = energy_metrics['consumption_coal'] * p['emission_factor_coal']
-co2_oil = energy_metrics['consumption_oil'] * p['emission_factor_oil']
-co2_gas = energy_metrics['consumption_gas'] * p.get('emission_factor_gas', 0)
-
-# Convertir a Megatoneladas
-total_co2_energy = (co2_coal + co2_oil + co2_gas) / 1000000.0
-
-# Agregar emisiones no energéticas (cemento, agricultura, desechos)
-total_co2 = total_co2_energy + p.get('co2_non_energy', 0)
-```
-
-**Ejemplo Numérico (2005):**
-- Carbón: 470 PJ × 85,000 kg/PJ = 39.95 Mt
-- Petróleo: 3,414 PJ × 74,000 kg/PJ = 252.64 Mt
-- Gas: 2,454 PJ × 37,000 kg/PJ = 90.80 Mt
-- **Subtotal energético:** 383.39 Mt
-- No energético (calibrado): 100 Mt
-- **Total:** 483.39 Mt
-
-**Nota:** El factor `co2_non_energy` de 100 Mt representa emisiones de:
-- Procesos industriales (cemento, acero)
-- Agricultura (fertilizantes, metano del ganado convertido a CO2-eq)
-- Desechos y tratamiento de aguas
-
-Este valor fue calibrado para el año base 2005 y crece dinámicamente con tasas de +1.2% (2005-2013) y +1.5% (2014-2020) para reflejar la industrialización.
+### Ecuación 23: Emisiones Totales de CO2 (Lógica de Importaciones Virtuales)
+ 
+ **Ecuación:**
+ $$CO_2 = CO_{2,fossil} + CO_{2,non-energy}$$
+ 
+ Donde:
+ $$CO_{2,fossil} = (ED - ES_{renewables}) \times Mix_{fossil} \times EF_{fossil}$$
+ 
+ **Derivación (Importaciones Virtuales):**
+ El modelo original calculaba emisiones basándose en la *oferta nacional* de combustibles. Esto creaba un error: si la producción petrolera de México caía, las emisiones bajaban artificialmente, aunque el país siguiera consumiendo gasolina importada.
+ 
+ **Nueva Lógica:**
+ 1. Calculamos la **Demanda Total de Energía** ($ED$).
+ 2. Restamos la **Oferta Renovable** ($ES_{renewables}$).
+ 3. El remanente es la **Energía Fósil Quemada** (sea nacional o importada).
+ 4. Aplicamos los factores de emisión a este remanente.
+ 
+ **Implementación (`wefe_model.py`, líneas 241-266):**
+ ```python
+ # 1. Demanda Total
+ total_energy_needed = energy_metrics['energy_demand']
+ 
+ # 2. Descontar Renovables
+ renewables = energy_metrics.get('supply_renewables', 0)
+ 
+ # 3. Energía Fósil "Efectiva" (Nacional + Importada)
+ fossil_energy_burned = max(0, total_energy_needed - renewables)
+ 
+ # 4. Calcular Emisiones
+ burn_coal = fossil_energy_burned * ratio_coal
+ burn_oil = fossil_energy_burned * ratio_oil
+ burn_gas = fossil_energy_burned * ratio_gas
+ ```
+ 
+ **Nota sobre Eficiencia Energética:**
+ Para corregir la sobreestimación de la demanda futura, implementamos un factor de **Mejora Tecnológica** que reduce la intensidad energética un **0.5% anual**.
+ $$Intensidad(t) = Intensidad(t-1) \times (1 - 0.005)$$
+ Esto simula que cada año los autos y fábricas son más eficientes, desacoplando el crecimiento del PIB del consumo energético.
 
 ---
 

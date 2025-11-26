@@ -149,9 +149,22 @@ class WEFEModel:
         p = self.params
         
         # --- DEMANDA (ED) ---
-        # Eq 9-11: Sectores
-        ed_ind = s['gdp'] * p['intensity_energy_ind']
-        ed_dom = s['population'] * p['intensity_energy_dom']
+        # Implementación de Eficiencia Energética (Mejora Tecnológica)
+        # La intensidad energética baja cada año debido a mejores tecnologías
+        
+        # Inicializar intensidades actuales si no existen
+        if 'intensity_energy_ind_current' not in s:
+            s['intensity_energy_ind_current'] = p['intensity_energy_ind']
+            s['intensity_energy_dom_current'] = p['intensity_energy_dom']
+            
+        # Aplicar mejora de eficiencia anual
+        efficiency_rate = self.scenarios.get('growth_energy_efficiency', 0.015)
+        s['intensity_energy_ind_current'] *= (1 - efficiency_rate)
+        s['intensity_energy_dom_current'] *= (1 - efficiency_rate)
+        
+        # Eq 9-11: Sectores (Usando intensidades dinámicas)
+        ed_ind = s['gdp'] * s['intensity_energy_ind_current']
+        ed_dom = s['population'] * s['intensity_energy_dom_current']
         
         # Eq 12: Energía para agua
         ed_water = water_metrics['water_demand'] * p['energy_per_m3_water']
@@ -226,7 +239,12 @@ class WEFEModel:
             'energy_ratio': e_r,
             'consumption_coal': s['es_coal'], 
             'consumption_oil': s['es_oil'],
-            'consumption_gas': s['es_gas']
+            'consumption_gas': s['es_gas'],
+            # Exportamos datos para el módulo de ecología (Cálculo de emisiones basado en demanda)
+            'supply_renewables': supply_renewables,
+            'ratio_coal': ratio_coal,
+            'ratio_oil': ratio_oil,
+            'ratio_gas': ratio_gas
         }
 
     def _step_ecology(self, energy_metrics):
@@ -237,13 +255,36 @@ class WEFEModel:
         p = self.params
         
         # --- CO2 (Eq 23-24) - MODELO CALIBRADO CON CRECIMIENTO POR TRAMOS ---
-        # Emisiones = Consumo (PJ) * Factor (kg/TJ)
-        # 1 PJ = 1000 TJ
-        # Resultado en kg, dividimos entre 1000 para Toneladas
+        # --- CO2 (Eq 23-24) - LÓGICA DE IMPORTACIONES VIRTUALES ---
+        # El problema anterior era que las emisiones bajaban si bajaba la producción petrolera nacional,
+        # aunque el país siguiera consumiendo lo mismo (importando gasolina).
+        # NUEVA LÓGICA: Emisiones = f(Demanda Total), no f(Oferta Nacional).
         
-        co2_coal = energy_metrics['consumption_coal'] * p['emission_factor_coal']
-        co2_oil = energy_metrics['consumption_oil'] * p['emission_factor_oil']
-        co2_gas = energy_metrics['consumption_gas'] * p.get('emission_factor_gas', 0)
+        # 1. Obtenemos la DEMANDA TOTAL de energía (Lo que el país realmente quema)
+        total_energy_needed = energy_metrics['energy_demand']
+        
+        # 2. Descontamos las Renovables (Solar, Eólica, Hidro, Bioenergía)
+        # Asumimos que las renovables se consumen primero.
+        renewables = energy_metrics.get('supply_renewables', 0)
+        
+        # 3. Calculamos la Energía Fósil "Efectiva" (Nacional + Importada)
+        # Si la demanda es mayor que renovables, el resto ES FÓSIL.
+        fossil_energy_burned = max(0, total_energy_needed - renewables)
+        
+        # 4. Aplicamos el Mix de Combustibles Histórico
+        # Usamos los ratios que vienen de _step_energy
+        ratio_coal = energy_metrics.get('ratio_coal', 0.044)
+        ratio_oil = energy_metrics.get('ratio_oil', 0.721)
+        ratio_gas = energy_metrics.get('ratio_gas', 0.235)
+        
+        burn_coal = fossil_energy_burned * ratio_coal
+        burn_oil = fossil_energy_burned * ratio_oil
+        burn_gas = fossil_energy_burned * ratio_gas
+        
+        # 5. Calculamos Emisiones con Factores de Emisión
+        co2_coal = burn_coal * p['emission_factor_coal']
+        co2_oil = burn_oil * p['emission_factor_oil']
+        co2_gas = burn_gas * p.get('emission_factor_gas', 0)
         
         # Convertimos de Toneladas a Megatoneladas (Mt)
         total_co2_energy = (co2_coal + co2_oil + co2_gas) / 1000000.0
