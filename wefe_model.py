@@ -128,9 +128,10 @@ class WEFEModel:
         ws_effective = total_ws_natural * factor_oferta_efectiva
         
         # --- BALANCE (Wr) (Eq 7) ---
-        # Ratio = Oferta Efectiva / Demanda Total
+        # Corrección: Usamos wd_human en el denominador porque ws_effective YA descuenta el caudal ecológico.
+        # Si usáramos wd_total, estaríamos contando la restricción ecológica dos veces.
+        w_r = ws_effective / wd_human if wd_human > 0 else 0
         # Usamos la oferta ajustada para que el indicador de estrés sea realista.
-        w_r = ws_effective / wd_total if wd_total > 0 else 0
         
         return {
             'water_demand': wd_human,     

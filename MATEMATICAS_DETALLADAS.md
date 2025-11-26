@@ -189,7 +189,8 @@ Para corregir esto, calculamos el **Factor de Oferta Efectiva ($k_{WS}$)** usand
 $$ WS_{ef,total} = 38,272 + 164,490 = 202,762 \text{ hm}^3 $$
 
 El factor de corrección es la relación entre la realidad y la oferta bruta:
-$$ k_{WS} = \frac{202,762}{472,194} \approx \mathbf{0.429} $$
+
+$$k_{WS} = \frac{202,762}{472,194} \approx \mathbf{0.429}$$
 
 **Implementación (`wefe_model.py`, líneas 119-122):**
 ```python

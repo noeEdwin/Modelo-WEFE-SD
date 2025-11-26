@@ -99,6 +99,39 @@ function setupEventListeners() {
             document.getElementById('growth_agri_yield').value = (scenarioData.growth_agri_yield * 100).toFixed(1);
         }
     });
+
+    // ===== Help Modal Logic =====
+    const modal = document.getElementById('helpModal');
+    const openBtn = document.getElementById('openHelp');
+    const closeBtn = document.querySelector('.close-modal');
+    const tabs = document.querySelectorAll('.tab-btn');
+    const contents = document.querySelectorAll('.tab-content');
+
+    openBtn.addEventListener('click', () => {
+        modal.style.display = 'block';
+    });
+
+    closeBtn.addEventListener('click', () => {
+        modal.style.display = 'none';
+    });
+
+    window.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            // Remove active class from all
+            tabs.forEach(t => t.classList.remove('active'));
+            contents.forEach(c => c.classList.remove('active'));
+
+            // Add active class to clicked
+            tab.classList.add('active');
+            document.getElementById(tab.dataset.tab).classList.add('active');
+        });
+    });
 }
 
 // ===== Run Simulation =====

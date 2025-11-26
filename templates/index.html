@@ -169,6 +169,10 @@
 
                     <!-- Export Actions -->
                     <div class="export-actions">
+                        <button id="openHelp" class="btn btn-primary" style="background-color: #8b5cf6;">
+                            <span class="btn-icon">💡</span>
+                            Explicación de Gráficas
+                        </button>
                         <button id="exportCSV" class="btn btn-secondary">
                             <span class="btn-icon">📊</span>
                             Exportar CSV
@@ -190,6 +194,92 @@
                     </div>
                 </div>
             </main>
+        </div>
+    </div>
+
+    <!-- Help Modal -->
+    <div id="helpModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Explicación del Modelo (Contexto México)</h2>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="tab-water">Agua 💧</button>
+                    <button class="tab-btn" data-tab="tab-food">Alimentos 🌾</button>
+                    <button class="tab-btn" data-tab="tab-energy">Energía ⚡</button>
+                    <button class="tab-btn" data-tab="tab-ecology">CO₂ 🌍</button>
+                </div>
+
+                <div id="tab-water" class="tab-content active">
+                    <h3>Análisis de las Gráficas (¿Qué nos dicen?)</h3>
+                    <p>A primera vista, la línea de <strong>Oferta</strong> (arriba) parece muy alejada de la <strong>Demanda</strong> (abajo), lo que sugiere que sobra agua. Sin embargo, en la gestión hídrica, <strong>tener el doble de lo que necesitas no es suficiente</strong>.</p>
+                    <p>Esa "distancia" visual representa nuestro <strong>margen de seguridad</strong>. En México, este margen es engañoso debido a la **desigualdad geográfica**: el agua abunda en el sur, pero escasea en el centro y norte donde se concentra la demanda. No tenemos un "colchón" real en las zonas críticas. Por eso, aunque las líneas no se toquen, vivimos bajo <strong>Estrés Hídrico</strong>: el sistema opera al límite en las regiones más pobladas.</p>
+                    
+                    <div class="info-box" style="border-left-color: var(--color-water); margin-bottom: 1.5rem;">
+                        <p><strong>Conceptos Clave:</strong></p>
+                        <ul style="margin-left: 1.5rem; margin-bottom: 0.5rem;">
+                            <li><strong>Seguridad Hídrica (Ratio > 4):</strong> Disponibilidad robusta que permite cubrir la demanda humana y ecológica sin riesgos, incluso en periodos secos.</li>
+                            <li><strong>Estrés Hídrico (Ratio 1.7 - 4):</strong> La demanda presiona la oferta disponible. Se requiere una gestión estricta y existe vulnerabilidad ante sequías.</li>
+                            <li><strong>Escasez Hídrica (Ratio < 1.7):</strong> Insuficiencia crónica de agua para satisfacer simultáneamente las necesidades domésticas, agrícolas e industriales.</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-box">
+                        <p><strong>El Factor de Oferta Efectiva (0.429):</strong></p>
+                        <p>Es un "filtro de realidad". De cada 100 litros que llueven en el país, el modelo descarta 57 porque:</p>
+                        <ol style="margin-left: 1.5rem;">
+                            <li>Caen en el sur (selvas) y no se pueden llevar al norte (desiertos) donde está la gente.</li>
+                            <li>Deben quedarse en los ríos para que no mueran los ecosistemas (Caudal Ecológico).</li>
+                        </ol>
+                        <p>Solo nos quedan <strong>43 litros "efectivos"</strong> reales para usar.</p>
+                    </div>
+                </div>
+
+                <div id="tab-food" class="tab-content">
+                    <h3>Análisis de las Gráficas (¿Qué nos dicen?)</h3>
+                    <p>La gráfica muestra el <strong>Ratio de Seguridad Alimentaria</strong>, que compara las calorías producidas (línea verde oscura) con las requeridas por la población (línea clara). Una tendencia creciente indica que la productividad agrícola está aumentando más rápido que la población.</p>
+                    
+                    <p><strong>Contexto (Ganadería):</strong> Aunque el ratio sea superior a 1 (lo que teóricamente indica autosuficiencia), en la realidad gran parte de esos granos se destinan a alimentar ganado en lugar de personas. Por eso, aunque la gráfica muestre superávit, el país puede seguir dependiendo de importaciones.</p>
+
+                    <div class="info-box">
+                        <p><strong>Interpretación del Ratio:</strong></p>
+                        <ul>
+                            <li><strong>Ratio > 1:</strong> Producción excede requerimientos calóricos básicos.</li>
+                            <li><strong>Ratio < 1:</strong> Déficit calórico (Riesgo de seguridad alimentaria).</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div id="tab-energy" class="tab-content">
+                    <h3>Análisis de las Gráficas (¿Qué nos dicen?)</h3>
+                    <p>La gráfica revela la <strong>Brecha Energética</strong>: la distancia entre la Demanda de Energía (línea clara, que crece con el PIB) y la Oferta Nacional (línea oscura, que depende de Pemex y renovables). Cuanto más se separan estas líneas, mayor es la dependencia de combustibles extranjeros.</p>
+
+                    <div class="info-box">
+                        <p><strong>Interpretación:</strong></p>
+                        <ul>
+                            <li><strong>Brecha Grande:</strong> Alta dependencia de importaciones (Gasolina/Gas).</li>
+                            <li><strong>Brecha Pequeña:</strong> Mayor soberanía energética.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div id="tab-ecology" class="tab-content">
+                    <h3>Análisis de las Gráficas (¿Qué nos dicen?)</h3>
+                    <p>La gráfica de <strong>Emisiones de CO₂</strong> sigue la tendencia de la Demanda de Energía. Si ves que la curva se aplana o crece más lento que la energía, indica un "desacople" positivo gracias a la eficiencia energética o energías limpias. Si crece igual o más rápido, indica una industrialización sucia.</p>
+
+                    <p><strong>Contexto (Emisiones por Demanda):</strong> El modelo cuenta todas las emisiones generadas por el consumo del país, incluyendo las de la gasolina importada que se quema en nuestros autos.</p>
+
+                    <div class="info-box">
+                        <p><strong>Interpretación:</strong></p>
+                        <ul>
+                            <li><strong>Tendencia al Alza:</strong> Aumento de emisiones por crecimiento económico.</li>
+                            <li><strong>Cambio de Pendiente:</strong> Efecto de políticas de eficiencia o cambio tecnológico.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
