@@ -105,12 +105,11 @@ class WEFEModel:
         wd_energy = s['energy_production_total'] * p['quota_water_energy']
         
         # --- AJUSTE POR USO NO REGISTRADO ---
-        # Los datos de demanda son de volumen concesionado (oficial).
-        # Aplicamos factores para reflejar el uso real (incluye pozos clandestinos, extracción ilegal, etc.)
-        factor_unregistered_agri = p.get('factor_unregistered_agri', 1.50)    # +50%
-        factor_unregistered_ind = p.get('factor_unregistered_ind', 1.20)      # +20%
-        factor_unregistered_dom = p.get('factor_unregistered_dom', 1.30)      # +30%
-        factor_unregistered_energy = p.get('factor_unregistered_energy', 1.10) # +10%
+        
+        factor_unregistered_agri = p.get('factor_unregistered_agri', 1.50)
+        factor_unregistered_ind = p.get('factor_unregistered_ind', 1.20)      
+        factor_unregistered_dom = p.get('factor_unregistered_dom', 1.30)      
+        factor_unregistered_energy = p.get('factor_unregistered_energy', 1.10) 
         
         wd_agri_real = wd_agri * factor_unregistered_agri
         wd_ind_real = wd_ind * factor_unregistered_ind
