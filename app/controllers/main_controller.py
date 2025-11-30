@@ -1,15 +1,12 @@
-from flask import Flask, render_template, request, jsonify, send_file
-from flask_cors import CORS
+from flask import Blueprint, render_template, request, jsonify, send_file
 import json
 import pandas as pd
-from wefe_model import WEFEModel
 import io
-import csv
+from app.models.wefe_model import WEFEModel
 
-app = Flask(__name__)
-CORS(app)
+main_bp = Blueprint('main', __name__)
 
-# Ruta al archivo de configuración
+# Ruta al archivo de configuración (asumiendo ejecución desde root)
 CONFIG_FILE = 'config_mexico_2005.json'
 
 def load_config():
@@ -17,12 +14,12 @@ def load_config():
     with open(CONFIG_FILE, 'r') as f:
         return json.load(f)
 
-@app.route('/')
+@main_bp.route('/')
 def index():
     """Sirve la página principal"""
     return render_template('index.html')
 
-@app.route('/api/config', methods=['GET'])
+@main_bp.route('/api/config', methods=['GET'])
 def get_config():
     """Obtiene la configuración actual del modelo"""
     try:
@@ -37,16 +34,10 @@ def get_config():
             'error': str(e)
         }), 500
 
-@app.route('/api/simulate', methods=['POST'])
+@main_bp.route('/api/simulate', methods=['POST'])
 def simulate():
     """
     Ejecuta una simulación con los parámetros proporcionados
-    
-    Espera un JSON con:
-    - initial_data: Datos iniciales del modelo
-    - params: Parámetros técnicos
-    - scenarios: Escenarios de crecimiento
-    - years: Número de años a simular (opcional, default: 30)
     """
     try:
         data = request.get_json()
@@ -109,7 +100,7 @@ def simulate():
             'error': str(e)
         }), 500
 
-@app.route('/api/export/csv', methods=['POST'])
+@main_bp.route('/api/export/csv', methods=['POST'])
 def export_csv():
     """Exporta los resultados de la simulación a CSV"""
     try:
@@ -148,7 +139,7 @@ def export_csv():
             'error': str(e)
         }), 500
 
-@app.route('/api/scenarios', methods=['GET'])
+@main_bp.route('/api/scenarios', methods=['GET'])
 def get_scenarios():
     """Obtiene escenarios predefinidos para la simulación WEFE"""
     scenarios = {
@@ -188,8 +179,3 @@ def get_scenarios():
         'success': True,
         'scenarios': scenarios
     })
-
-if __name__ == '__main__':
-    print("🚀 Iniciando servidor WEFE...")
-    print("📊 Interfaz disponible en: http://localhost:5000")
-    app.run(debug=True, host='0.0.0.0', port=5000)

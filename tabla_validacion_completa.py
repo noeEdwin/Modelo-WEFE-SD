@@ -2,7 +2,7 @@ import psycopg2
 import pandas as pd
 import json
 from config import DB_CONFIG
-from wefe_model import WEFEModel
+from app.models.wefe_model import WEFEModel
 
 def get_real_data():
     """Fetch historical data from Postgres"""
