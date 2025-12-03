@@ -6,7 +6,6 @@ from app.models.wefe_model import WEFEModel
 
 main_bp = Blueprint('main', __name__)
 
-# Ruta al archivo de configuración (asumiendo ejecución desde root)
 CONFIG_FILE = 'config_mexico_2005.json'
 
 def load_config():
@@ -36,33 +35,27 @@ def get_config():
 
 @main_bp.route('/api/simulate', methods=['POST'])
 def simulate():
-    """
-    Ejecuta una simulación con los parámetros proporcionados
-    """
+    """Ejecuta una simulación con los parámetros proporcionados"""
     try:
         data = request.get_json()
         
-        # Validar que se recibieron los datos necesarios
         if not data:
             return jsonify({
                 'success': False,
                 'error': 'No se recibieron datos'
             }), 400
         
-        # Extraer parámetros
         initial_data = data.get('initial_data', {})
         params = data.get('params', {})
         scenarios = data.get('scenarios', {})
         years = data.get('years', 30)
         
-        # Validar años
         if not isinstance(years, int) or years < 1 or years > 100:
             return jsonify({
                 'success': False,
                 'error': 'El número de años debe ser un entero entre 1 y 100'
             }), 400
         
-        # Crear y ejecutar el modelo
         modelo = WEFEModel(
             initial_data=initial_data,
             params=params,
@@ -70,11 +63,8 @@ def simulate():
         )
         
         resultados = modelo.run(years=years)
-        
-        # Convertir DataFrame a formato JSON amigable
         resultados_json = resultados.to_dict(orient='records')
         
-        # Calcular estadísticas resumidas
         summary = {
             'total_years': len(resultados),
             'start_year': int(resultados['year'].iloc[0]),
@@ -113,15 +103,12 @@ def export_csv():
                 'error': 'No hay resultados para exportar'
             }), 400
         
-        # Convertir a DataFrame
         df = pd.DataFrame(results)
         
-        # Crear CSV en memoria
         output = io.StringIO()
         df.to_csv(output, index=False)
         output.seek(0)
         
-        # Convertir a bytes
         output_bytes = io.BytesIO()
         output_bytes.write(output.getvalue().encode('utf-8'))
         output_bytes.seek(0)
@@ -147,30 +134,30 @@ def get_scenarios():
             'name': 'Caso Base 2005 (Business as Usual)',
             'description': 'Configuración histórica de México 2005 con tasas de crecimiento moderadas',
             'scenarios': {
-                'growth_pop': 0.0115,      # 1.15% anual - tasa histórica
-                'growth_gdp': 0.01,       # 1% anual - crecimiento moderado
-                'growth_urbanization': 0.0176,  # 1.76% anual
-                'growth_agri_yield': 0.022     # 2.2% anual - mejora gradual
+                'growth_pop': 0.0115,
+                'growth_gdp': 0.01,
+                'growth_urbanization': 0.0176,
+                'growth_agri_yield': 0.022
             }
         },
         'crecimiento_acelerado': {
             'name': 'Crecimiento Acelerado (Presión WEFE)',
             'description': 'Alto crecimiento poblacional y económico - máxima presión sobre recursos agua-energía-alimento',
             'scenarios': {
-                'growth_pop': 0.020,       # 2.0% anual - presión demográfica alta
-                'growth_gdp': 0.045,       # 4.5% anual - industrialización acelerada
-                'growth_urbanization': 0.008,  # 0.8% anual - urbanización rápida
-                'growth_agri_yield': 0.015     # 1.5% anual - tecnología agrícola rezagada
+                'growth_pop': 0.020,
+                'growth_gdp': 0.045,
+                'growth_urbanization': 0.008,
+                'growth_agri_yield': 0.015
             }
         },
         'transicion_sostenible': {
             'name': 'Transición Sostenible (Eficiencia WEFE)',
             'description': 'Crecimiento controlado con innovación tecnológica - eficiencia en uso de recursos',
             'scenarios': {
-                'growth_pop': 0.008,       # 0.8% anual - control demográfico
-                'growth_gdp': 0.032,       # 3.2% anual - crecimiento verde
-                'growth_urbanization': 0.005,  # 0.5% anual - urbanización planificada
-                'growth_agri_yield': 0.040     # 4.0% anual - revolución agrotecnológica
+                'growth_pop': 0.008,
+                'growth_gdp': 0.032,
+                'growth_urbanization': 0.005,
+                'growth_agri_yield': 0.040
             }
         }
     }

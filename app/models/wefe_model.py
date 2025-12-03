@@ -2,13 +2,7 @@ import pandas as pd
 
 class WEFEModel:
     def __init__(self, initial_data, params, scenarios):
-        """
-        Inicializa el modelo WEFE con los datos base y coeficientes.
-        
-        :param initial_data: Diccionario con valores del año base (Stocks iniciales).
-        :param params: Diccionario con coeficientes técnicos (Factores de emisión, cuotas).
-        :param scenarios: Diccionario con tasas de cambio anuales (Variables de decisión).
-        """
+        """Inicializa el modelo WEFE con los datos base y coeficientes."""
         self.state = initial_data.copy()
         self.params = params
         self.scenarios = scenarios
@@ -16,16 +10,11 @@ class WEFEModel:
         self.history = []
 
     def _calculate_social_economic(self):
-        """
-        Paso 0: Actualizar conductores macro (Población, PIB, Urbanización).
-        [cite_start]Cita PDF: Secciones 2.3.5 y 2.4 [cite: 416, 425]
-        """
-        # Tasas de crecimiento definidas en el escenario
+        """Actualizo conductores macro (Población, PIB, Urbanización)."""
         self.state['population'] *= (1 + self.scenarios.get('growth_pop', 0))
         self.state['gdp'] *= (1 + self.scenarios.get('growth_gdp', 0))
         self.state['urbanization_rate'] += self.scenarios.get('growth_urbanization', 0)
         
-        # Crecimiento tecnológico en agricultura (Rendimientos)
         growth_yield = self.scenarios.get('growth_agri_yield', 0)
         self.state['yield_grains'] *= (1 + growth_yield)
         self.state['yield_veggies'] *= (1 + growth_yield)
@@ -35,39 +24,28 @@ class WEFEModel:
         self.state['yield_dairy'] *= (1 + growth_yield)
 
     def _step_food(self):
-        """
-        [cite_start]Subsistema de Alimentos: Ecuaciones 16-20 [cite: 362-377]
-        Calcula demanda y oferta para 5 categorías clave + ganadería.
-        """
+        """Calculo demanda y oferta para 5 categorías clave + ganadería."""
         s = self.state
         p = self.params
         
-        # --- DEMANDA HUMANA (Directa) ---
         fd_grains_human = s['population'] * p['diet_grains_per_capita']
         fd_veggies = s['population'] * p['diet_veggies_per_capita']
         fd_fruits = s['population'] * p['diet_fruits_per_capita']
         fd_meat = s['population'] * (p['diet_red_meat_per_capita'] + p['diet_white_meat_per_capita'])
         fd_dairy = s['population'] * p['diet_dairy_per_capita']
 
-        # --- DEMANDA GANADERA (Indirecta - Feed) ---
-        # Asumimos conversión: kg grano / kg carne. 
-        # Promedios globales: Res ~7:1, Pollo ~2:1, Cerdo ~4:1.
-        # Simplificación: Factor ponderado ~3.5 para carne total y ~1.2 para lácteos
+        # Asumo conversión kg grano / kg carne: Res ~7:1, Pollo ~2:1, Cerdo ~4:1
         factor_feed_meat = 3.5
         factor_feed_dairy = 1.2
         
-        # La demanda de carne impulsa la demanda de granos forrajeros
         fd_feed_meat = fd_meat * factor_feed_meat
         fd_feed_dairy = fd_dairy * factor_feed_dairy
         
         total_feed_demand = fd_feed_meat + fd_feed_dairy
-        
-        # Demanda Total de Granos = Consumo Humano + Forraje
         fd_grains_total = fd_grains_human + total_feed_demand
 
         total_fd = fd_grains_total + fd_veggies + fd_fruits + fd_meat + fd_dairy
         
-        # --- OFERTA (FS) ---
         fs_grains = s['area_grains'] * s['yield_grains']
         fs_veggies = s['area_veggies'] * s['yield_veggies']
         fs_fruits = s['area_fruits'] * s['yield_fruits']
@@ -85,27 +63,16 @@ class WEFEModel:
         }
 
     def _step_water(self, food_metrics):
-        """
-        [cite_start]Subsistema de Agua: Ecuaciones 1-7 [cite: 323-348]
-        """
+        """Calculo demanda y oferta de agua."""
         s = self.state
         p = self.params
         
-        # --- DEMANDA CONSUNTIVA (Humana) ---
-        # Eq 2: Agricultura
         wd_agri = (s['area_grains'] + s['area_veggies'] + s['area_fruits']) * p['quota_water_crop']
-        
-        # Eq 3: Industria
         wd_ind = s['gdp'] * p['quota_water_ind']
-        
-        # Eq 4: Doméstico
         wd_dom = s['population'] * p['quota_water_dom']
-        
-        # Eq 5: Energía
         wd_energy = s['energy_production_total'] * p['quota_water_energy']
         
-        # --- AJUSTE POR USO NO REGISTRADO ---
-        
+        # Ajusto por uso no registrado
         factor_unregistered_agri = p.get('factor_unregistered_agri', 1.50)
         factor_unregistered_ind = p.get('factor_unregistered_ind', 1.20)      
         factor_unregistered_dom = p.get('factor_unregistered_dom', 1.30)      
@@ -116,108 +83,70 @@ class WEFEModel:
         wd_dom_real = wd_dom * factor_unregistered_dom
         wd_energy_real = wd_energy * factor_unregistered_energy
         
-        # Total Demanda Humana (Consuntiva) - Ajustada por uso no registrado
         wd_human = (wd_agri_real + wd_ind_real + wd_dom_real + wd_energy_real) / 1000000.0
         
-        # --- REQUERIMIENTO ECOLÓGICO (Eq 1) ---
-        # El paper (Ling et al., 2024) suma la demanda ecológica a la demanda total.
         wd_eco = s.get('wd_eco_req', 0)
-        
-        # Demanda Total = Demanda Humana + Demanda Ecológica
         wd_total = wd_human + wd_eco
 
-        # --- OFERTA DISPONIBLE (WS) (Eq 6) ---
-        # Oferta Total Natural (Bruta) - Lo que llueve
         total_ws_natural = s['ws_surface'] + s['ws_ground'] + s['ws_unconventional']
         
-        # --- OFERTA HÍDRICA EFECTIVA (WS_ef) ---
-        # Aplicamos el "Factor de Realidad" calculado con datos de la EAM 2005 (Tabla 3.4).
-        # Factor = 0.429 (43%)
-        # Representa el agua que realmente se puede usar sin secar ríos en el sur 
-        # ni inventar agua en el norte.
+        # Aplico factor de oferta efectiva 0.429 (43%) - representa el agua realmente utilizable
         factor_oferta_efectiva = 0.429
-        
         ws_effective = total_ws_natural * factor_oferta_efectiva
         
-        # --- BALANCE (Wr) (Eq 7) ---
-        # Corrección: Usamos wd_human en el denominador porque ws_effective YA descuenta el caudal ecológico.
-        # Si usáramos wd_total, estaríamos contando la restricción ecológica dos veces.
+        # Uso wd_human en el denominador porque ws_effective YA descuenta el caudal ecológico
         w_r = ws_effective / wd_human if wd_human > 0 else 0
-        # Usamos la oferta ajustada para que el indicador de estrés sea realista.
         
         return {
             'water_demand': wd_human,     
-            'water_supply': ws_effective, # Reportamos la efectiva (la realista)
+            'water_supply': ws_effective,
             'water_ratio': w_r,
             'wd_eco': wd_eco,
             'wd_total_system': wd_total,
-            'ws_potential_climate': total_ws_natural # Guardamos el dato bruto por si se necesita
+            'ws_potential_climate': total_ws_natural
         }
 
     def _step_energy(self, water_metrics, food_metrics):
-        """
-        [cite_start]Subsistema de Energía: Ecuaciones 8-15 [cite: 352-396]
-        """
+        """Calculo demanda y oferta de energía."""
         s = self.state
         p = self.params
         
-        # --- DEMANDA (ED) ---
-        # Implementación de Eficiencia Energética (Mejora Tecnológica)
-        # La intensidad energética baja cada año debido a mejores tecnologías
-        
-        # Inicializar intensidades actuales si no existen
         if 'intensity_energy_ind_current' not in s:
             s['intensity_energy_ind_current'] = p['intensity_energy_ind']
             s['intensity_energy_dom_current'] = p['intensity_energy_dom']
             
-        # Aplicar mejora de eficiencia anual
         efficiency_rate = self.scenarios.get('growth_energy_efficiency', 0.015)
         s['intensity_energy_ind_current'] *= (1 - efficiency_rate)
         s['intensity_energy_dom_current'] *= (1 - efficiency_rate)
         
-        # Eq 9-11: Sectores (Usando intensidades dinámicas)
         ed_ind = s['gdp'] * s['intensity_energy_ind_current']
         ed_dom = s['population'] * s['intensity_energy_dom_current']
-        
-        # Eq 12: Energía para agua
         ed_water = water_metrics['water_demand'] * p['energy_per_m3_water']
-        
-        # Eq 9 (Food): Energía para agricultura (tractores, etc.)
         ed_agri = food_metrics['food_supply_total'] * p.get('energy_intensity_agri', 0)
         
         total_ed = ed_ind + ed_dom + ed_water + ed_agri
 
-        # --- OFERTA (ES) - MODELO CALIBRADO CON CRECIMIENTO POR TRAMOS ---
-        # La oferta de energía tiene dos períodos distintos reflejando la realidad mexicana:
-        # Período 1 (2005-2013): Estabilidad (+0.23% anual)
-        # Período 2 (2014-2020): Caída acelerada (-7.16% anual) - reforma energética
-        
+        # Modelo calibrado con crecimiento por tramos:
+        # 2005-2013: +0.23% anual (estabilidad)
+        # 2014-2020: -7.16% anual (reforma energética)
         transition_year = self.scenarios.get('energy_transition_year', 2013)
         
         if s['year'] <= transition_year:
-            # Período estable
             growth_rate = self.scenarios.get('growth_energy_supply', 0.0023)
         else:
-            # Período de caída acelerada
             growth_rate = self.scenarios.get('growth_energy_supply_post_2013', -0.0716)
         
         s['energy_production_total'] *= (1 + growth_rate)
         
-        # Eq 14: Bioenergía (Paja de cultivos) - componente renovable variable
         bioenergy = food_metrics['production_grains'] * p.get('straw_energy_factor', 0)
         supply_renewables = s['es_renewables'] + bioenergy
         
-        # La oferta total está limitada por la capacidad de producción
-        # No puede exceder energy_production_total
         total_es = s['energy_production_total']
         
-        # Distribución de la oferta entre fuentes (manteniendo proporciones históricas)
-        # Basado en los valores base del año 2005
         base_coal = self.state.get('es_coal_base', self.state.get('es_coal', 470.137))
         base_oil = self.state.get('es_oil_base', self.state.get('es_oil', 7752.316))
         base_gas = self.state.get('es_gas_base', self.state.get('es_gas', 2532.210))
         
-        # Guardar valores base en el primer paso
         if 'es_coal_base' not in self.state:
             self.state['es_coal_base'] = base_coal
             self.state['es_oil_base'] = base_oil
@@ -230,20 +159,16 @@ class WEFEModel:
             ratio_oil = base_oil / total_fossil_base
             ratio_gas = base_gas / total_fossil_base
         else:
-            # Fallback basado en mix energético de México (Actualizado 2005 Oferta Total)
-            ratio_coal = 0.0437  # ~4.4%
-            ratio_oil = 0.7208   # ~72.1%
-            ratio_gas = 0.2354   # ~23.5%
+            ratio_coal = 0.0437
+            ratio_oil = 0.7208
+            ratio_gas = 0.2354
         
-        # Oferta de fósiles = Producción total - Renovables
         fossil_supply = max(0, total_es - supply_renewables)
         
         s['es_coal'] = fossil_supply * ratio_coal
         s['es_oil'] = fossil_supply * ratio_oil
         s['es_gas'] = fossil_supply * ratio_gas
         
-        # --- BALANCE (Er) ---
-        # Eq 15
         e_r = total_es / total_ed if total_ed > 0 else 0
         
         return {
@@ -253,7 +178,6 @@ class WEFEModel:
             'consumption_coal': s['es_coal'], 
             'consumption_oil': s['es_oil'],
             'consumption_gas': s['es_gas'],
-            # Exportamos datos para el módulo de ecología (Cálculo de emisiones basado en demanda)
             'supply_renewables': supply_renewables,
             'ratio_coal': ratio_coal,
             'ratio_oil': ratio_oil,
@@ -261,31 +185,17 @@ class WEFEModel:
         }
 
     def _step_ecology(self, energy_metrics):
-        """
-        [cite_start]Subsistema de Ecología: Ecuaciones 21-24 [cite: 398-409]
-        """
+        """Calculo emisiones de CO2 y COD."""
         s = self.state
         p = self.params
         
-        # --- CO2 (Eq 23-24) - MODELO CALIBRADO CON CRECIMIENTO POR TRAMOS ---
-        # --- CO2 (Eq 23-24) - LÓGICA DE IMPORTACIONES VIRTUALES ---
-        # El problema anterior era que las emisiones bajaban si bajaba la producción petrolera nacional,
-        # aunque el país siguiera consumiendo lo mismo (importando gasolina).
-        # NUEVA LÓGICA: Emisiones = f(Demanda Total), no f(Oferta Nacional).
-        
-        # 1. Obtenemos la DEMANDA TOTAL de energía (Lo que el país realmente quema)
+        # Calculo emisiones basadas en DEMANDA, no en producción nacional
+        # (incluye importaciones virtuales)
         total_energy_needed = energy_metrics['energy_demand']
-        
-        # 2. Descontamos las Renovables (Solar, Eólica, Hidro, Bioenergía)
-        # Asumimos que las renovables se consumen primero.
         renewables = energy_metrics.get('supply_renewables', 0)
         
-        # 3. Calculamos la Energía Fósil "Efectiva" (Nacional + Importada)
-        # Si la demanda es mayor que renovables, el resto ES FÓSIL.
         fossil_energy_burned = max(0, total_energy_needed - renewables)
         
-        # 4. Aplicamos el Mix de Combustibles Histórico
-        # Usamos los ratios que vienen de _step_energy
         ratio_coal = energy_metrics.get('ratio_coal', 0.044)
         ratio_oil = energy_metrics.get('ratio_oil', 0.721)
         ratio_gas = energy_metrics.get('ratio_gas', 0.235)
@@ -294,45 +204,33 @@ class WEFEModel:
         burn_oil = fossil_energy_burned * ratio_oil
         burn_gas = fossil_energy_burned * ratio_gas
         
-        # 5. Calculamos Emisiones con Factores de Emisión
         co2_coal = burn_coal * p['emission_factor_coal']
         co2_oil = burn_oil * p['emission_factor_oil']
         co2_gas = burn_gas * p.get('emission_factor_gas', 0)
         
-        # Convertimos de Toneladas a Megatoneladas (Mt)
         total_co2_energy = (co2_coal + co2_oil + co2_gas) / 1000000.0
         
-        # CO2 no energético también tiene crecimiento por tramos
-        # Inicializar el estado de CO2 no energético si no existe
         if 'co2_non_energy_current' not in s:
             s['co2_non_energy_current'] = p.get('co2_non_energy', 0)
         
-        # Aplicar crecimiento al CO2 no energético
         transition_year = self.scenarios.get('energy_transition_year', 2013)
         
         if s['year'] <= transition_year:
-            # Período de crecimiento (2005-2013)
             growth_rate_non_energy = p.get('growth_co2_non_energy', 0.0128)
         else:
-            # Período de declinación (2014+)
             growth_rate_non_energy = p.get('growth_co2_non_energy_post_2013', -0.0192)
         
         s['co2_non_energy_current'] *= (1 + growth_rate_non_energy)
         
-        # Sumamos emisiones energéticas y no energéticas
         total_co2 = total_co2_energy + s['co2_non_energy_current']
         
-        # --- COD (Eq 21-22) ---
-        # Contaminación del agua
         wastewater = (s['population'] * p['quota_water_dom']) * 0.8
         total_cod = wastewater * p['pollutant_concentration_dom']
         
         return {'total_co2': total_co2, 'total_cod': total_cod}
 
     def run(self, years=10):
-        """Ejecuta la simulación principal"""
-        # print(f"Iniciando simulación desde {self.current_year}...")
-        
+        """Ejecuto la simulación principal."""
         for _ in range(years):
             self._calculate_social_economic()
             
@@ -350,20 +248,12 @@ class WEFEModel:
             
             self.history.append(year_data)
             
-            # Actualización de stocks dependientes de recursos (Feedback)
-            # Opción A: Estrés Hídrico Regional (Aggregation Bias Fix)
-            # Aunque el promedio nacional (Ratio) sea > 1.0, asumimos que si es < 3.0
-            # ya existen regiones críticas sobreexplotando acuíferos.
+            # Simulo estrés hídrico regional: si water_ratio < 3.0, hay sobreexplotación
             if water_res['water_ratio'] < 3.0:
-                # No restamos el déficit nacional (que es negativo o cero),
-                # sino un "Factor de Estrés Regional" muy suave.
-                # Antes: 0.20 (20%) -> Causaba colapso irreal.
-                # Ahora: 0.005 (0.5%) -> Simula degradación lenta y realista.
                 factor_regional = 0.005
                 extraccion_insostenible = water_res['water_demand'] * factor_regional
                 self.state['ws_ground'] -= extraccion_insostenible
                 
-                # Evitar valores negativos (Acuífero agotado)
                 if self.state['ws_ground'] < 0:
                     self.state['ws_ground'] = 0
             
@@ -373,43 +263,29 @@ class WEFEModel:
         return pd.DataFrame(self.history)
 
     def calibrar(self, datos_reales_df):
-        """
-        Compara simulación vs realidad (Validación histórica).
-        [cite_start][cite: 460-463] (Ecuación 25: Error relativo)
-        """
-        # Ejecutamos el modelo por la misma cantidad de años que tenemos en la BD
+        """Comparo simulación vs realidad (Validación histórica)."""
         years_to_sim = len(datos_reales_df)
         simulacion = self.run(years=years_to_sim)
         
         errores = {}
         print("\n--- REPORTE DE CALIBRACIÓN (Simulación vs. Base de Datos) ---")
         
-        # MAPEO CLAVE: 
-        # Izquierda: Nombre de variable en tu simulación (Python)
-        # Derecha: Nombre exacto de la columna en tu Base de Datos (PostgreSQL)
         mapa_vars = {
             'water_demand':      'demanda_agua_total',
             'total_co2':         'emisiones_co2_real',
-            # Sumamos las producciones reales para comparar con el total simulado
             'food_supply_total': ['prod_granos_real', 'prod_hortalizas_real', 'prod_frutas_real', 'prod_carne_real', 'prod_lacteos_real'],
             'energy_demand':     'consumo_energia_real',
             'energy_supply':     'oferta_energia_real'
         }
         
         for var_sim, var_db in mapa_vars.items():
-            # Obtenemos valores simulados
             val_sim = simulacion[var_sim].values
             
-            # Obtenemos valores reales (Manejando si es una columna única o suma de varias)
             if isinstance(var_db, list):
-                # Si es una lista (Alimentos), sumamos las columnas de la BD
                 val_real = datos_reales_df[var_db].sum(axis=1).values
             else:
-                # Si es una sola columna (Agua, CO2)
                 val_real = datos_reales_df[var_db].values
             
-            # Cálculo del Error (Ecuación 25 del paper)
-            # Evitamos división por cero
             val_real_safe = val_real.copy()
             val_real_safe[val_real_safe == 0] = 1 
             
