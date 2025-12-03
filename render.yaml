@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: modelo-wefe
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --bind 0.0.0.0:$PORT run:app
+    envVars:
+      - key: DB_HOST
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_NAME
+        sync: false
+      - key: DB_PORT
+        value: 5432
+      - key: DB_OPTIONS
+        value: "-c search_path=ModeloWEFE,modelo_wefe"
