@@ -2,6 +2,7 @@ services:
   - type: web
     name: modelo-wefe
     env: python
+    pythonVersion: "3.11.9"
     region: oregon
     plan: free
     buildCommand: ./render-build.sh
